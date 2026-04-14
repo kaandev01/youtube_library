@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>youLIB</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { width: 300px; padding: 0; font-family: Calibri, Arial, sans-serif; }
+
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px 12px; border-bottom: 1px solid var(--border);
+    }
+    .logo { display: flex; align-items: center; gap: 8px; }
+    .logo-icon {
+      width: 22px; height: 22px; background: var(--accent);
+      border-radius: 5px; display: flex; align-items: center;
+      justify-content: center; font-size: 12px;
+    }
+    .logo-text {
+      font-size: 16px; font-weight: 700;
+      color: var(--cream); letter-spacing: 0.01em;
+    }
+    .version-tag {
+      font-family: var(--font-mono);
+      font-size: 9px; color: var(--cream-dim);
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 4px; padding: 1px 5px;
+    }
+
+    .section { padding: 14px 16px; }
+    .section + .section { border-top: 1px solid var(--border); }
+
+    .hint {
+      font-size: 11px; color: var(--cream-dim);
+      line-height: 1.6; margin-bottom: 12px;
+    }
+    .hint strong { color: var(--accent); }
+
+    .settings-label {
+      font-family: var(--font-mono);
+      font-size: 10px; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--cream-dim); margin-bottom: 4px;
+    }
+    .key-hint {
+      font-size: 11px; color: var(--cream-dim);
+      opacity: 0.65; margin-bottom: 6px;
+    }
+    .key-hint a { color: var(--accent); text-decoration: none; }
+    .key-row { display: flex; gap: 6px; }
+    .key-row input { flex: 1; font-family: var(--font-mono); font-size: 11px; padding: 7px 10px; }
+    .key-row .btn { padding: 7px 10px; font-size: 11px; }
+    .saved-msg {
+      font-family: var(--font-mono);
+      font-size: 10px; color: var(--green);
+      margin-top: 5px; height: 14px;
+    }
+
+    .stat-row { display: flex; gap: 8px; margin-bottom: 12px; }
+    .stat { flex: 1; text-align: center; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 4px; }
+    .stat-n { font-size: 22px; font-weight: 700; color: var(--accent); line-height: 1; }
+    .stat-l {
+      font-family: var(--font-mono);
+      font-size: 9px; color: var(--cream-dim);
+      text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">📼</div>
+      <span class="logo-text">you<span id="logo-accent" style="color:var(--accent)">LIB</span></span>
+    </div>
+    <span class="version-tag">v2.0</span>
+  </div>
+
+  <!-- Stats + Library -->
+  <div class="section" id="stats-section">
+    <div class="stat-row">
+      <div class="stat"><div class="stat-n" id="s-total">0</div><div class="stat-l">Video</div></div>
+      <div class="stat"><div class="stat-n" id="s-avg">—</div><div class="stat-l">Ort. Puan</div></div>
+      <div class="stat"><div class="stat-n" id="s-folders">0</div><div class="stat-l">Klasör</div></div>
+    </div>
+    <button class="btn btn-primary" id="btn-library" style="width:100%;">📚 Kütüphaneyi Aç</button>
+  </div>
+
+  <!-- Usage hint -->
+  <div class="section">
+    <div class="hint">
+      YouTube'da video izlerken sağda beliren <strong>📼 Arşivle</strong> butonuna tıkla — özet türü seç, dil belirle, klasöre ata ve kaydet.
+    </div>
+  </div>
+
+  <!-- Theme -->
+  <div class="section">
+    <div class="settings-label">Tema</div>
+    <div class="theme-toggle-row" style="margin-top:6px;">
+      <button class="theme-btn" id="theme-amber" data-theme="amber">🟡 Amber</button>
+      <button class="theme-btn" id="theme-mono" data-theme="mono">⚪ Mono</button>
+    </div>
+  </div>
+
+  <!-- Groq Key -->
+  <div class="section">
+    <div class="settings-label">Groq API Key <span style="color:var(--green);font-size:9px;">(AI Özeti — Ücretsiz)</span></div>
+    <div class="key-hint">→ <a href="https://console.groq.com/keys" target="_blank">console.groq.com/keys</a></div>
+    <div class="key-row">
+      <input type="password" id="api-key-input" placeholder="gsk_..." />
+      <button class="btn btn-primary" id="btn-save-key">Kaydet</button>
+    </div>
+    <div class="saved-msg" id="saved-msg"></div>
+  </div>
+
+  <!-- Supadata Key -->
+  <div class="section">
+    <div class="settings-label">Supadata API Key <span style="color:var(--green);font-size:9px;">(Transkript — Ücretsiz)</span></div>
+    <div class="key-hint">→ <a href="https://supadata.ai/dashboard" target="_blank">supadata.ai/dashboard</a></div>
+    <div class="key-row">
+      <input type="password" id="supadata-key-input" placeholder="sup_..." />
+      <button class="btn btn-primary" id="btn-save-supadata">Kaydet</button>
+    </div>
+    <div class="saved-msg" id="supadata-saved-msg"></div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

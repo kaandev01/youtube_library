@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="amber">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>youLIB — Kütüphane</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      font-family: var(--font);
+    }
+
+    /* ── Layout ── */
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ─────────────────────────────────────
+       SIDEBAR
+    ───────────────────────────────────── */
+    .sidebar {
+      width: 216px;
+      flex-shrink: 0;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar-logo {
+      padding: 18px 16px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { display: flex; align-items: center; gap: 9px; }
+    .logo-mark {
+      width: 26px; height: 26px;
+      background: var(--accent);
+      border-radius: 7px;
+      flex-shrink: 0;
+    }
+    .logo-text {
+      font-size: 16px; font-weight: 700; color: var(--cream);
+      letter-spacing: -0.02em; line-height: 1.2;
+    }
+    .logo-sub {
+      font-size: 9px; font-weight: 500;
+      color: var(--cream-dim);
+      letter-spacing: 0.08em; text-transform: uppercase; margin-top: 1px;
+    }
+
+    .sidebar-section { padding: 14px 10px 4px; }
+    .sidebar-section-label {
+      font-size: 9px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--cream-dim); padding: 0 7px; margin-bottom: 3px;
+    }
+
+    .folder-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 8px; border-radius: var(--radius);
+      cursor: pointer; transition: background 0.12s;
+      position: relative;
+    }
+    .folder-item:hover { background: var(--bg3); }
+    .folder-item.active { background: var(--accent-glow); }
+    .folder-icon {
+      width: 16px; height: 16px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--cream-dim); font-size: 12px;
+    }
+    .folder-item.active .folder-icon { color: var(--accent); }
+    .folder-name {
+      font-size: 13px; font-weight: 400; color: var(--cream-dim);
+      flex: 1; min-width: 0; overflow: hidden;
+      text-overflow: ellipsis; white-space: nowrap;
+    }
+    .folder-item.active .folder-name { color: var(--accent); font-weight: 500; }
+    .folder-count {
+      font-size: 10px; font-weight: 500;
+      color: var(--cream-dim); background: var(--bg3);
+      border: 1px solid var(--border); border-radius: 99px;
+      padding: 0 6px; line-height: 1.7; flex-shrink: 0;
+    }
+    .folder-item.active .folder-count {
+      color: var(--accent); border-color: var(--accent-dim);
+      background: var(--accent-glow);
+    }
+
+    .folder-actions {
+      display: none; gap: 2px; flex-shrink: 0;
+    }
+    .folder-item:hover .folder-actions { display: flex; }
+    .folder-action-btn {
+      background: none; border: none; cursor: pointer;
+      font-size: 11px; color: var(--cream-dim); padding: 3px 5px;
+      border-radius: 4px; line-height: 1;
+      transition: background 0.1s, color 0.1s;
+    }
+    .folder-action-btn:hover { background: var(--bg); color: var(--cream); }
+
+    .sidebar-divider {
+      border: none; border-top: 1px solid var(--border);
+      margin: 8px 10px 4px;
+    }
+
+    .add-folder-btn {
+      display: flex; align-items: center; gap: 7px;
+      padding: 7px 15px; cursor: pointer; transition: color 0.15s;
+      font-size: 12px; font-weight: 500; color: var(--cream-dim);
+      background: none; border: none; font-family: var(--font);
+      width: 100%; text-align: left;
+    }
+    .add-folder-btn:hover { color: var(--accent); }
+    .add-folder-icon {
+      width: 16px; height: 16px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: inherit;
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      border-top: 1px solid var(--border);
+      padding: 12px 10px 14px;
+    }
+    .sidebar-theme-label {
+      font-size: 9px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--cream-dim); margin-bottom: 7px; padding: 0 7px;
+    }
+
+    /* ─────────────────────────────────────
+       MAIN
+    ───────────────────────────────────── */
+    .main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Topbar */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 15px 28px; border-bottom: 1px solid var(--border);
+      background: var(--bg); position: sticky; top: 0; z-index: 20;
+      gap: 16px;
+    }
+    .topbar-left {}
+    .topbar-title { font-size: 17px; font-weight: 700; color: var(--cream); letter-spacing: -0.02em; }
+    .topbar-folder-label {
+      font-size: 10px; font-weight: 500;
+      color: var(--accent); text-transform: uppercase;
+      letter-spacing: 0.07em; margin-top: 1px;
+    }
+    .topbar-right {
+      display: flex; align-items: center; gap: 10px;
+    }
+    #view-count {
+      font-size: 11px; font-weight: 500; color: var(--cream-dim);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Stats */
+    .stats-bar {
+      display: flex; align-items: center; gap: 0;
+      padding: 16px 28px 0;
+    }
+    .stat {
+      display: flex; flex-direction: column; gap: 3px;
+      padding: 0 20px 0 0;
+    }
+    .stat:first-child { padding-left: 0; }
+    .stat-val {
+      font-size: 20px; font-weight: 700; color: var(--accent);
+      line-height: 1; letter-spacing: -0.02em;
+    }
+    .stat-label {
+      font-size: 9px; font-weight: 500;
+      color: var(--cream-dim); text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .stat-divider {
+      width: 1px; background: var(--border);
+      height: 28px; margin: 0 20px 0 0; flex-shrink: 0;
+    }
+
+    /* Controls */
+    .controls-bar {
+      display: flex; gap: 8px; align-items: center;
+      padding: 14px 28px; flex-wrap: wrap;
+    }
+    .search-wrap {
+      flex: 1; min-width: 200px; position: relative;
+    }
+    .search-wrap input {
+      padding-left: 34px; font-size: 13px;
+      padding-top: 8px; padding-bottom: 8px;
+      background: var(--bg2);
+    }
+    .search-icon {
+      position: absolute; left: 11px; top: 50%;
+      transform: translateY(-50%); font-size: 12px;
+      color: var(--cream-dim); pointer-events: none;
+    }
+
+    .filter-select {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); color: var(--cream);
+      font-family: var(--font); font-size: 12px; font-weight: 500;
+      padding: 8px 10px; outline: none; cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .filter-select:focus { border-color: var(--accent); }
+    option { background: var(--bg2); }
+
+    .sort-tabs {
+      display: flex; gap: 2px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 3px;
+    }
+    .sort-tab {
+      font-size: 11px; font-weight: 500;
+      padding: 5px 10px; border-radius: 5px; border: none;
+      cursor: pointer; color: var(--cream-dim); background: none;
+      transition: all 0.15s; letter-spacing: 0.01em;
+      font-family: var(--font);
+    }
+    .sort-tab.active {
+      background: var(--accent); color: var(--btn-text);
+      font-weight: 600;
+    }
+
+    /* Content */
+    .content-area { padding: 18px 28px 60px; flex: 1; }
+
+    /* ── Empty state ── */
+    #empty-state { text-align: center; padding: 80px 40px; display: none; }
+    .empty-icon { font-size: 36px; opacity: 0.15; margin-bottom: 16px; }
+    .empty-title { font-size: 16px; font-weight: 600; color: var(--cream-dim); margin-bottom: 6px; }
+    .empty-sub { font-size: 13px; color: var(--cream-dim); opacity: 0.5; line-height: 1.5; }
+
+    /* ── Video Grid ── */
+    #video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    /* ─────────────────────────────────────
+       CARD
+    ───────────────────────────────────── */
+    .video-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); overflow: hidden;
+      transition: border-color 0.18s, box-shadow 0.18s;
+      cursor: pointer;
+    }
+    .video-card:hover {
+      border-color: var(--border2);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    }
+
+    .card-thumb-wrap { position: relative; }
+    .card-thumb {
+      width: 100%; aspect-ratio: 16/9;
+      object-fit: cover; display: block; background: var(--bg3);
+    }
+    .card-rating-badge {
+      position: absolute; top: 8px; right: 8px;
+      background: rgba(10,10,14,0.88);
+      border: 1px solid var(--border2);
+      border-radius: 5px; padding: 2px 7px;
+      font-size: 10px; font-weight: 600; color: var(--cream-dim);
+      font-variant-numeric: tabular-nums;
+    }
+    .card-rating-badge.high {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .card-duration-badge {
+      position: absolute; bottom: 7px; right: 8px;
+      background: rgba(10,10,14,0.88); border-radius: 4px; padding: 2px 6px;
+      font-size: 10px; font-weight: 500; color: var(--cream-dim);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .card-body { padding: 12px 14px 14px; }
+
+    .card-folder-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 9px; font-weight: 600; color: var(--accent);
+      background: var(--accent-glow);
+      border: 1px solid var(--accent-dim);
+      border-radius: 99px; padding: 2px 8px;
+      margin-bottom: 7px; letter-spacing: 0.03em; text-transform: uppercase;
+    }
+
+    .card-title {
+      font-size: 13px; font-weight: 600; color: var(--cream);
+      line-height: 1.45; margin-bottom: 4px;
+      display: -webkit-box; -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
+      letter-spacing: -0.01em;
+    }
+    .card-channel {
+      font-size: 11px; font-weight: 400; color: var(--cream-dim);
+      margin-bottom: 8px;
+    }
+    .card-summary {
+      font-size: 12px; color: var(--cream-dim); line-height: 1.6;
+      display: -webkit-box; -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .card-no-summary {
+      font-size: 11px; color: var(--border2); font-style: italic;
+    }
+    .card-meta {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      margin-top: 10px; padding-top: 10px;
+      border-top: 1px solid var(--border);
+      gap: 4px;
+    }
+    .card-date {
+      font-size: 10px; font-weight: 400; color: var(--cream-dim);
+    }
+    .card-chips { display: flex; gap: 4px; }
+
+    /* ─────────────────────────────────────
+       MODAL (video detail)
+    ───────────────────────────────────── */
+    .vv-modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.78);
+      display: flex; justify-content: center; align-items: flex-start;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s ease;
+      overflow-y: auto;
+    }
+    .vv-modal-overlay.open { opacity: 1; pointer-events: all; }
+    .vv-modal-panel {
+      width: min(820px, 100%);
+      min-height: 100vh;
+      background: var(--bg);
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      transform: translateY(20px);
+      transition: transform 0.26s cubic-bezier(0.22,1,0.36,1);
+    }
+    .vv-modal-overlay.open .vv-modal-panel { transform: translateY(0); }
+
+    .vv-modal-header {
+      position: sticky; top: 0; z-index: 10;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 24px 16px;
+      display: flex; align-items: flex-start; gap: 14px;
+    }
+    .vv-modal-thumb {
+      width: 108px; height: 67px; border-radius: var(--radius);
+      object-fit: cover; background: var(--bg3); flex-shrink: 0;
+    }
+    .vv-modal-info { flex: 1; min-width: 0; }
+    .vv-modal-title {
+      font-size: 15px; font-weight: 700; color: var(--cream);
+      line-height: 1.4; margin-bottom: 4px; letter-spacing: -0.02em;
+    }
+    .vv-modal-channel {
+      font-size: 11px; font-weight: 400; color: var(--cream-dim); margin-bottom: 7px;
+    }
+    .vv-modal-meta { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+    .vv-modal-rating-badge {
+      font-size: 11px; font-weight: 600;
+      color: var(--accent); background: var(--accent-glow);
+      border: 1px solid rgba(245,158,11,0.22);
+      border-radius: 5px; padding: 2px 8px;
+    }
+    .vv-modal-folder-badge {
+      font-size: 10px; font-weight: 500;
+      color: var(--cream-dim); background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 5px; padding: 2px 7px;
+    }
+    .vv-modal-date { font-size: 10px; font-weight: 400; color: var(--cream-dim); }
+    .vv-modal-close {
+      background: none; border: none; color: var(--cream-dim);
+      font-size: 13px; cursor: pointer; padding: 4px 7px;
+      line-height: 1; flex-shrink: 0; margin-top: 2px;
+      transition: color 0.15s; border-radius: var(--radius);
+      font-family: var(--font);
+    }
+    .vv-modal-close:hover { color: var(--cream); background: var(--bg3); }
+
+    .vv-modal-body {
+      flex: 1; padding: 28px 32px 48px;
+      display: flex; flex-direction: column; gap: 28px;
+    }
+    .vv-modal-section-label {
+      font-size: 10px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--cream-dim); margin-bottom: 12px;
+    }
+    .vv-modal-note { font-size: 14px; color: var(--cream); line-height: 1.75; white-space: pre-wrap; }
+    .vv-modal-actions {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      padding-top: 8px; border-top: 1px solid var(--border);
+    }
+    .vv-modal-stars { display: flex; gap: 3px; }
+    .vv-modal-star {
+      cursor: pointer; font-size: 19px;
+      color: var(--star-empty); transition: color 0.1s, transform 0.1s;
+      user-select: none; line-height: 1;
+    }
+    .vv-modal-star:hover, .vv-modal-star.active { color: var(--accent); }
+    .vv-modal-star:hover { transform: scale(1.1); }
+    .vv-modal-rating-row { display: flex; align-items: center; gap: 12px; }
+    .vv-modal-rating-val {
+      font-size: 12px; font-weight: 600;
+      color: var(--accent); min-width: 40px; font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Markdown in modal ── */
+    .vv-md .vv-md-heading {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--accent); margin: 18px 0 8px;
+      padding-bottom: 6px; border-bottom: 1px solid var(--border);
+    }
+    .vv-md .vv-md-heading:first-child { margin-top: 0; }
+    .vv-md .vv-md-para { font-size: 14px; color: var(--cream); line-height: 1.8; margin: 4px 0; }
+    .vv-md .vv-md-list { margin: 5px 0 5px 2px; padding: 0; list-style: none; }
+    .vv-md .vv-md-list li {
+      font-size: 14px; color: var(--cream);
+      line-height: 1.8; padding: 2px 0 2px 16px; position: relative;
+    }
+    .vv-md .vv-md-list li::before {
+      content: '›'; position: absolute; left: 0;
+      color: var(--accent); font-weight: 700; font-size: 15px;
+    }
+    .vv-md .vv-md-list li strong,
+    .vv-md .vv-md-para strong { color: var(--cream); font-weight: 600; }
+    .vv-badge {
+      display: inline-block; padding: 1px 6px;
+      border-radius: 4px; font-size: 11px; font-weight: 600;
+    }
+    .vv-badge-warn { background:rgba(245,158,11,0.12); color:#F59E0B; border:1px solid rgba(245,158,11,0.25); }
+    .vv-badge-crit { background:rgba(239,68,68,0.10); color:#EF4444; border:1px solid rgba(239,68,68,0.22); }
+    .vv-badge-info { background:rgba(99,102,241,0.10); color:#818CF8; border:1px solid rgba(99,102,241,0.22); }
+
+    /* ── Summary type tabs (modal) ── */
+    .summary-type-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; }
+    .summary-type-tab {
+      font-size: 10px; font-weight: 500;
+      padding: 5px 10px; border-radius: 5px;
+      border: 1px solid var(--border); background: var(--bg2);
+      color: var(--cream-dim); cursor: pointer;
+      transition: all 0.15s; letter-spacing: 0.03em;
+      font-family: var(--font);
+    }
+    .summary-type-tab.active {
+      background: var(--accent-glow); border-color: var(--accent); color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* ── Collapsible summary sections (modal) ── */
+    .modal-summary-section {
+      border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; margin-bottom: 8px;
+    }
+    .modal-summary-section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 15px; cursor: pointer; background: var(--bg2);
+      transition: background 0.15s;
+    }
+    .modal-summary-section-header:hover { background: var(--bg3); }
+    .modal-summary-section-header-title {
+      font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.07em; color: var(--accent);
+    }
+    .modal-summary-section-body {
+      padding: 16px; border-top: 1px solid var(--border); display: none;
+    }
+    .modal-summary-section-body.open { display: block; }
+    .expand-arrow { font-size: 10px; color: var(--cream-dim); transition: transform 0.2s; }
+    .modal-summary-section.open .expand-arrow { transform: rotate(180deg); }
+
+    /* ── Important moments (modal) ── */
+    .moments-grid { display: flex; flex-direction: column; gap: 9px; }
+    .moment-item {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 11px 13px;
+    }
+    .moment-header { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .moment-badge {
+      font-size: 9px; font-weight: 600;
+      padding: 2px 7px; border-radius: 99px;
+    }
+    .moment-ts { font-size: 10px; color: var(--accent); margin-left: auto; font-variant-numeric: tabular-nums; }
+    .moment-title { font-size: 13px; font-weight: 600; color: var(--cream); margin-bottom: 3px; }
+    .moment-desc { font-size: 12px; color: var(--cream-dim); line-height: 1.55; }
+    .moment-why { font-size: 11px; color: var(--accent); margin-top: 4px; font-style: italic; }
+
+    /* ── Folder modal ── */
+    .folder-modal-overlay {
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,0.65);
+      display: flex; justify-content: center; align-items: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.18s;
+    }
+    .folder-modal-overlay.open { opacity: 1; pointer-events: all; }
+    .folder-modal-box {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 24px;
+      width: 340px; max-width: 90vw;
+    }
+    .folder-modal-title {
+      font-size: 15px; font-weight: 700; color: var(--cream);
+      margin-bottom: 14px; letter-spacing: -0.01em;
+    }
+    .folder-modal-actions {
+      display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Folder Modal (create/rename) -->
+  <div id="folder-modal" class="folder-modal-overlay">
+    <div class="folder-modal-box">
+      <div class="folder-modal-title" id="folder-modal-title">Yeni Klasör</div>
+      <input type="text" id="folder-modal-input" placeholder="Klasör adı..." />
+      <div class="folder-modal-actions">
+        <button class="btn btn-ghost" id="folder-modal-cancel">İptal</button>
+        <button class="btn btn-primary" id="folder-modal-confirm">Oluştur</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Video Detail Modal -->
+  <div id="vv-modal" class="vv-modal-overlay">
+    <div class="vv-modal-panel" id="vv-modal-panel"></div>
+  </div>
+
+  <div class="app-shell">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo">
+          <div class="logo-mark"></div>
+          <div>
+            <div class="logo-text">you<span style="color:var(--accent)">LIB</span></div>
+            <div class="logo-sub">Kütüphane</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Görünüm</div>
+        <div class="folder-item active" data-folder-id="all">
+          <span class="folder-icon">≡</span>
+          <span class="folder-name">Tüm Videolar</span>
+          <span class="folder-count" id="count-all">0</span>
+        </div>
+        <div class="folder-item" data-folder-id="uncategorized">
+          <span class="folder-icon">◻</span>
+          <span class="folder-name">Kategorisiz</span>
+          <span class="folder-count" id="count-uncat">0</span>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Klasörlerim</div>
+        <div id="folder-list"><!-- rendered by JS --></div>
+      </div>
+
+      <hr class="sidebar-divider" />
+      <button class="add-folder-btn" id="btn-add-folder">
+        <span class="add-folder-icon">+</span>
+        Yeni Klasör
+      </button>
+
+      <div class="sidebar-bottom">
+        <div class="sidebar-theme-label">Tema</div>
+        <div class="theme-toggle-row">
+          <button class="theme-btn" id="theme-amber" data-theme="amber">Amber</button>
+          <button class="theme-btn" id="theme-mono" data-theme="mono">Mono</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="main">
+      <div class="topbar">
+        <div class="topbar-left">
+          <div class="topbar-title" id="topbar-title">Tüm Videolar</div>
+          <div class="topbar-folder-label" id="topbar-subtitle"></div>
+        </div>
+        <div class="topbar-right">
+          <span id="view-count"></span>
+        </div>
+      </div>
+
+      <div class="stats-bar">
+        <div class="stat">
+          <div class="stat-val" id="stat-total">0</div>
+          <div class="stat-label">Video</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <div class="stat-val" id="stat-avg">—</div>
+          <div class="stat-label">Ort. Puan</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <div class="stat-val" id="stat-high">0</div>
+          <div class="stat-label">8+ Puan</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <div class="stat-val" id="stat-time">0d</div>
+          <div class="stat-label">İzleme</div>
+        </div>
+      </div>
+
+      <div class="controls-bar">
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input type="text" id="search-input" placeholder="Başlık, kanal, not veya özet ara..." />
+        </div>
+        <div class="sort-tabs">
+          <button class="sort-tab active" data-sort="newest">Yeni</button>
+          <button class="sort-tab" data-sort="rating">Puan</button>
+          <button class="sort-tab" data-sort="oldest">Eski</button>
+        </div>
+        <select class="filter-select" id="rating-filter">
+          <option value="all">Tüm Puanlar</option>
+          <option value="high">8+ Puan</option>
+          <option value="mid">5–7 Puan</option>
+          <option value="low">1–4 Puan</option>
+          <option value="none">Puansız</option>
+        </select>
+      </div>
+
+      <div class="content-area">
+        <div id="empty-state">
+          <div class="empty-icon">▣</div>
+          <div class="empty-title" id="empty-title">Kütüphane boş</div>
+          <div class="empty-sub" id="empty-sub">YouTube'da bir video izle ve Arşivle butonuna bas.</div>
+        </div>
+        <div id="video-grid"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="library.js"></script>
+</body>
+</html>
