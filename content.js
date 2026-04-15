@@ -15,26 +15,51 @@ function injectStyles() {
   style.textContent = `
     /* ── Archive Button ── */
     #vv2-btn {
-      position: fixed; right: 20px; top: 50%;
-      transform: translateY(-50%); z-index: 9998;
-      background: #0C0C10; border: 1px solid #F59E0B;
-      border-radius: 10px; padding: 10px 13px;
-      cursor: pointer; display: flex; flex-direction: column;
-      align-items: center; gap: 4px;
-      box-shadow: 0 4px 24px rgba(245,158,11,0.18);
-      transition: transform 0.2s, box-shadow 0.2s;
+      position: fixed; right: 0; top: 50%;
+      transform: translateY(-50%);
+      z-index: 9998;
+      background: rgba(9,9,14,0.96);
+      border: 1px solid rgba(245,158,11,0.3);
+      border-right: none;
+      border-radius: 12px 0 0 12px;
+      padding: 16px 11px 14px;
+      cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 7px;
+      box-shadow: -4px 0 24px rgba(0,0,0,0.5), inset 1px 0 0 rgba(245,158,11,0.05);
+      transition: all 0.22s cubic-bezier(0.25,0.46,0.45,0.94);
       font-family: 'Inter', system-ui, sans-serif;
     }
-    #vv2-btn.mono-theme { background: #F4F4F4; border-color: #1A1A1A; box-shadow: 0 4px 20px rgba(0,0,0,0.12); }
-    #vv2-btn:hover { transform: translateY(-50%) scale(1.04); box-shadow: 0 6px 28px rgba(245,158,11,0.32); }
-    #vv2-btn.mono-theme:hover { box-shadow: 0 6px 28px rgba(0,0,0,0.22); }
-    #vv2-btn .vv2-btn-icon { font-size: 17px; line-height: 1; }
-    #vv2-btn .vv2-btn-label { font-size: 8px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #F59E0B; }
-    #vv2-btn.mono-theme .vv2-btn-label { color: #1A1A1A; }
+    #vv2-btn.mono-theme {
+      background: rgba(244,244,244,0.97);
+      border-color: rgba(26,26,26,0.22);
+      box-shadow: -4px 0 20px rgba(0,0,0,0.10);
+    }
+    #vv2-btn:hover {
+      border-color: rgba(245,158,11,0.55);
+      box-shadow: -6px 0 30px rgba(0,0,0,0.6), -2px 0 14px rgba(245,158,11,0.14);
+      transform: translateY(-50%) translateX(-3px);
+    }
+    #vv2-btn.mono-theme:hover {
+      border-color: rgba(26,26,26,0.45);
+      box-shadow: -6px 0 28px rgba(0,0,0,0.16);
+    }
+    #vv2-btn .vv2-btn-icon {
+      width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;
+      color: #F59E0B; flex-shrink: 0;
+    }
+    #vv2-btn.mono-theme .vv2-btn-icon { color: #1A1A1A; }
+    #vv2-btn .vv2-btn-label {
+      font-size: 7px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(245,158,11,0.6);
+      writing-mode: vertical-rl; transform: rotate(180deg);
+    }
+    #vv2-btn.mono-theme .vv2-btn-label { color: rgba(26,26,26,0.45); }
 
     /* ── Backdrop ── */
     #vv2-backdrop {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 9998;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 9998;
       opacity: 0; animation: vv2-fade-in 0.2s ease forwards;
     }
     @keyframes vv2-fade-in { to { opacity: 1; } }
@@ -42,98 +67,116 @@ function injectStyles() {
     /* ── Panel ── */
     #vv2-panel {
       position: fixed; right: 0; top: 0; bottom: 0; width: 400px;
-      background: var(--vv-bg, #0C0C10);
-      border-left: 1px solid var(--vv-border, #252530);
+      background: var(--vv-bg);
+      border-left: 1px solid var(--vv-border);
       z-index: 9999; display: flex; flex-direction: column;
       transform: translateX(100%);
-      animation: vv2-slide-in 0.26s cubic-bezier(0.22,1,0.36,1) forwards;
-      font-family: var(--vv-font, 'Inter', system-ui, sans-serif);
+      animation: vv2-slide-in 0.28s cubic-bezier(0.22,1,0.36,1) forwards;
+      font-family: var(--vv-font);
       overflow: hidden;
+      box-shadow: -8px 0 40px rgba(0,0,0,0.5);
     }
     @keyframes vv2-slide-in { to { transform: translateX(0); } }
 
     /* Theme variables */
     #vv2-panel.theme-amber {
-      --vv-bg: #0C0C10; --vv-bg2: #111118; --vv-bg3: #18181F;
-      --vv-border: #252530; --vv-border2: #363648;
+      --vv-bg: #09090E; --vv-bg2: #0D0D14; --vv-bg3: #121219; --vv-bg4: #181820;
+      --vv-border: #1C1C28; --vv-border2: #2A2A3C;
       --vv-accent: #F59E0B; --vv-accent-dim: #B97A08;
-      --vv-accent-glow: rgba(245,158,11,0.09);
-      --vv-cream: #E4DFD5; --vv-cream-dim: #6A6560;
+      --vv-accent-glow: rgba(245,158,11,0.08);
+      --vv-cream: #E6E1D9; --vv-cream-dim: #52504C;
       --vv-red: #EF4444; --vv-green: #22C55E;
-      --vv-btn-text: #0C0C10; --vv-star-empty: #2A2A38;
+      --vv-btn-text: #09090E; --vv-star-empty: #1E1E2A;
       --vv-font: 'Inter', system-ui, -apple-system, sans-serif;
-      --vv-r: 6px; --vv-r-md: 8px; --vv-r-lg: 10px;
+      --vv-r: 6px; --vv-r-md: 9px; --vv-r-lg: 12px;
     }
     #vv2-panel.theme-mono {
-      --vv-bg: #F4F4F4; --vv-bg2: #FFFFFF; --vv-bg3: #EBEBEB;
-      --vv-border: #DCDCDC; --vv-border2: #C4C4C4;
+      --vv-bg: #F3F3F3; --vv-bg2: #FFFFFF; --vv-bg3: #EAEAEA; --vv-bg4: #E1E1E1;
+      --vv-border: #DADADA; --vv-border2: #C2C2C2;
       --vv-accent: #1A1A1A; --vv-accent-dim: #555555;
       --vv-accent-glow: rgba(26,26,26,0.06);
-      --vv-cream: #111111; --vv-cream-dim: #666666;
+      --vv-cream: #0F0F0F; --vv-cream-dim: #909090;
       --vv-red: #DC2626; --vv-green: #16A34A;
-      --vv-btn-text: #FFFFFF; --vv-star-empty: #CCCCCC;
+      --vv-btn-text: #FFFFFF; --vv-star-empty: #D0D0D0;
       --vv-font: 'Inter', system-ui, -apple-system, sans-serif;
-      --vv-r: 6px; --vv-r-md: 8px; --vv-r-lg: 10px;
+      --vv-r: 6px; --vv-r-md: 9px; --vv-r-lg: 12px;
     }
 
     /* ── Header ── */
     .vv2-header {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 13px 18px; border-bottom: 1px solid var(--vv-border);
+      padding: 14px 18px 13px;
+      border-bottom: 1px solid var(--vv-border);
+      background: var(--vv-bg2);
       flex-shrink: 0;
     }
-    .vv2-logo { font-size: 14px; font-weight: 700; color: var(--vv-cream); letter-spacing: -0.02em; }
+    .vv2-logo { display: flex; align-items: center; gap: 8px; }
+    .vv2-logo-mark {
+      width: 20px; height: 20px;
+      background: var(--vv-accent);
+      border-radius: 5px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--vv-btn-text);
+    }
+    .vv2-logo-text {
+      font-size: 14px; font-weight: 700; color: var(--vv-cream); letter-spacing: -0.025em;
+    }
+    .vv2-logo-text em { color: var(--vv-accent); font-style: normal; }
     .vv2-close {
       background: none; border: none; color: var(--vv-cream-dim);
-      font-size: 13px; cursor: pointer; padding: 5px 8px;
-      line-height: 1; border-radius: var(--vv-r); transition: color 0.15s, background 0.15s;
-      font-family: var(--vv-font);
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border-radius: var(--vv-r);
+      transition: color 0.15s, background 0.15s;
+      font-family: var(--vv-font); font-size: 12px;
     }
     .vv2-close:hover { color: var(--vv-cream); background: var(--vv-bg3); }
 
     /* ── Scrollable body ── */
     .vv2-body {
-      flex: 1; overflow-y: auto; padding: 16px 18px;
-      display: flex; flex-direction: column; gap: 16px;
+      flex: 1; overflow-y: auto; padding: 0;
+      display: flex; flex-direction: column;
     }
     .vv2-body::-webkit-scrollbar { width: 3px; }
     .vv2-body::-webkit-scrollbar-thumb { background: var(--vv-border); border-radius: 2px; }
 
+    /* ── Body section block ── */
+    .vv2-body-section {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--vv-border);
+    }
+    .vv2-body-section:last-child { border-bottom: none; }
+
     /* ── Video card ── */
     .vv2-video-card { display: flex; gap: 12px; align-items: flex-start; }
     .vv2-thumb {
-      width: 100px; height: 62px; border-radius: var(--vv-r-md);
+      width: 96px; height: 60px; border-radius: var(--vv-r-md);
       object-fit: cover; background: var(--vv-bg3); flex-shrink: 0;
     }
-    .vv2-video-info { flex: 1; min-width: 0; padding-top: 1px; }
+    .vv2-video-info { flex: 1; min-width: 0; }
     .vv2-video-title {
-      font-size: 13px; font-weight: 600; color: var(--vv-cream); line-height: 1.4; margin: 0 0 4px;
+      font-size: 13px; font-weight: 600; color: var(--vv-cream); line-height: 1.4; margin: 0 0 3px;
       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      letter-spacing: -0.01em;
     }
-    .vv2-channel { font-size: 11px; color: var(--vv-cream-dim); font-weight: 400; }
-    .vv2-duration { font-size: 10px; color: var(--vv-cream-dim); margin-top: 3px; font-variant-numeric: tabular-nums; }
+    .vv2-channel { font-size: 11px; color: var(--vv-cream-dim); }
+    .vv2-duration { font-size: 10px; color: var(--vv-cream-dim); margin-top: 2px; font-variant-numeric: tabular-nums; }
 
-    /* ── Section label ── */
+    /* ── Labels ── */
     .vv2-label {
       font-size: 10px; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.08em; color: var(--vv-cream-dim); margin-bottom: 8px;
+      letter-spacing: 0.08em; color: var(--vv-cream-dim); margin-bottom: 10px;
     }
-
-    /* ── Field label ── */
     .vv2-field-label {
       font-size: 10px; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.07em; color: var(--vv-cream-dim); margin-bottom: 9px;
+      letter-spacing: 0.08em; color: var(--vv-cream-dim); margin-bottom: 10px;
     }
 
-    /* ── Settings section ── */
-    .vv2-settings-section {
-      background: var(--vv-bg2); border: 1px solid var(--vv-border);
-      border-radius: var(--vv-r-lg); padding: 14px;
-      display: flex; flex-direction: column; gap: 14px;
-    }
+    /* ── Settings section (wrapper) ── */
+    .vv2-settings-section { display: flex; flex-direction: column; gap: 16px; }
 
-    /* ── Radio cards (summary mode) ── */
-    .vv2-radio-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    /* ── Radio cards ── */
+    .vv2-radio-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
     .vv2-radio-card { position: relative; cursor: pointer; }
     .vv2-radio-card input[type="radio"] { position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0; }
     .vv2-radio-card-label {
@@ -149,38 +192,37 @@ function injectStyles() {
       color: var(--vv-accent); font-weight: 600;
     }
 
-    /* ── Toggle switches ── */
-    .vv2-toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 2px 0; }
+    /* ── Toggle rows ── */
+    .vv2-toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 3px 0; }
     .vv2-toggle-name { font-size: 12px; font-weight: 500; color: var(--vv-cream); }
-    .vv2-switch { position: relative; display: inline-flex; cursor: pointer; width: 32px; height: 18px; flex-shrink: 0; }
+    .vv2-switch { position: relative; display: inline-flex; cursor: pointer; width: 34px; height: 20px; flex-shrink: 0; }
     .vv2-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
     .vv2-switch-thumb {
       position: absolute; inset: 0; border-radius: 99px;
-      background: var(--vv-bg3); border: 1px solid var(--vv-border2);
-      transition: background 0.2s, border-color 0.2s;
+      background: var(--vv-bg4); border: 1px solid var(--vv-border2); transition: all 0.2s;
     }
     .vv2-switch-thumb::after {
-      content: ''; position: absolute; top: 2px; left: 2px;
+      content: ''; position: absolute; top: 3px; left: 3px;
       width: 12px; height: 12px; border-radius: 50%;
-      background: var(--vv-cream-dim); transition: transform 0.2s, background 0.2s;
+      background: var(--vv-cream-dim); transition: all 0.2s;
     }
-    .vv2-switch input:checked + .vv2-switch-thumb { background: var(--vv-accent-glow); border-color: var(--vv-accent); }
+    .vv2-switch input:checked + .vv2-switch-thumb { background: rgba(245,158,11,0.12); border-color: var(--vv-accent); }
     .vv2-switch input:checked + .vv2-switch-thumb::after { transform: translateX(14px); background: var(--vv-accent); }
 
-    /* ── Checkbox row (legacy compat) ── */
+    /* ── Checkbox row (legacy) ── */
     .vv2-checkbox-row { display: flex; align-items: flex-start; gap: 8px; padding: 4px 0; cursor: pointer; }
     .vv2-checkbox-row input[type="checkbox"] { width: 14px; height: 14px; margin-top: 2px; accent-color: var(--vv-accent); cursor: pointer; flex-shrink: 0; }
     .vv2-checkbox-label { font-size: 12px; color: var(--vv-cream); cursor: pointer; line-height: 1.4; }
     .vv2-checkbox-label small { display: block; font-size: 10px; color: var(--vv-cream-dim); margin-top: 1px; }
 
-    /* ── Sub-option (block size) ── */
+    /* ── Block size ── */
     .vv2-sub-option {
-      margin-top: 8px; padding: 10px 11px;
+      margin-top: 10px; padding: 10px 12px;
       background: var(--vv-bg3); border-radius: var(--vv-r-md);
       border: 1px solid var(--vv-border); display: none;
     }
     .vv2-sub-option.visible { display: block; }
-    .vv2-sub-label { font-size: 10px; color: var(--vv-cream-dim); margin-bottom: 7px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+    .vv2-sub-label { font-size: 9px; color: var(--vv-cream-dim); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; }
     .vv2-block-btns { display: flex; gap: 5px; }
     .vv2-block-btn {
       flex: 1; padding: 6px 4px; border-radius: var(--vv-r);
@@ -192,9 +234,12 @@ function injectStyles() {
     .vv2-block-btn:hover { border-color: var(--vv-border2); color: var(--vv-cream); }
     .vv2-block-btn.active { background: var(--vv-accent-glow); border-color: var(--vv-accent); color: var(--vv-accent); font-weight: 600; }
 
+    /* ── Divider ── */
+    .vv2-settings-divider { border: none; border-top: 1px solid var(--vv-border); }
+
     /* ── Select row ── */
     .vv2-select-row { display: flex; align-items: center; gap: 10px; }
-    .vv2-select-label { font-size: 11px; color: var(--vv-cream-dim); font-weight: 500; white-space: nowrap; min-width: 34px; }
+    .vv2-select-label { font-size: 11px; color: var(--vv-cream-dim); font-weight: 500; white-space: nowrap; min-width: 32px; }
     .vv2-select {
       flex: 1; background: var(--vv-bg3); border: 1px solid var(--vv-border);
       border-radius: var(--vv-r); color: var(--vv-cream); font-family: var(--vv-font);
@@ -204,7 +249,7 @@ function injectStyles() {
     .vv2-select option { background: var(--vv-bg2); }
 
     /* ── Folder row ── */
-    .vv2-folder-row { display: flex; align-items: center; gap: 10px; }
+    .vv2-folder-row { display: flex; align-items: center; gap: 8px; }
     .vv2-folder-controls { display: flex; gap: 6px; flex: 1; min-width: 0; }
     .vv2-folder-create-btn {
       background: var(--vv-bg3); border: 1px solid var(--vv-border); border-radius: var(--vv-r);
@@ -221,7 +266,7 @@ function injectStyles() {
       box-sizing: border-box; margin-bottom: 7px;
     }
     .vv2-input-sm:focus { border-color: var(--vv-accent); }
-    .vv2-input-sm::placeholder { color: var(--vv-cream-dim); opacity: 0.45; }
+    .vv2-input-sm::placeholder { color: var(--vv-cream-dim); opacity: 0.5; }
     .vv2-folder-create-actions { display: flex; gap: 6px; justify-content: flex-end; }
     .vv2-btn-ghost-sm {
       padding: 5px 12px; border: 1px solid var(--vv-border); border-radius: var(--vv-r);
@@ -236,35 +281,32 @@ function injectStyles() {
     }
     .vv2-btn-primary-sm:hover { filter: brightness(1.08); }
 
-    /* ── Divider ── */
-    .vv2-settings-divider { border: none; border-top: 1px solid var(--vv-border); }
-
     /* ── Saved banner ── */
     .vv2-saved-banner {
-      background: rgba(34,197,94,0.07); border: 1px solid rgba(34,197,94,0.20);
-      border-radius: var(--vv-r); padding: 8px 12px; font-size: 11px; color: var(--vv-green); font-weight: 500;
+      background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.18);
+      border-radius: var(--vv-r-md); padding: 9px 12px; font-size: 11px;
+      color: var(--vv-green); font-weight: 500;
     }
 
-    /* ── Summary content ── */
-    .vv2-summary-content { }
-    .vv2-summary-block { border: 1px solid var(--vv-border); border-radius: var(--vv-r-md); overflow: hidden; margin-bottom: 7px; }
+    /* ── Summary blocks ── */
+    .vv2-summary-block { border: 1px solid var(--vv-border); border-radius: var(--vv-r-lg); overflow: hidden; margin-bottom: 7px; }
     .vv2-summary-block-header {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 13px; cursor: pointer; background: var(--vv-bg2); transition: background 0.15s;
+      padding: 11px 14px; cursor: pointer; background: var(--vv-bg2); transition: background 0.15s;
     }
     .vv2-summary-block-header:hover { background: var(--vv-bg3); }
     .vv2-summary-block-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--vv-accent); }
-    .vv2-summary-block-body { padding: 13px; border-top: 1px solid var(--vv-border); display: none; }
+    .vv2-summary-block-body { padding: 14px 15px; border-top: 1px solid var(--vv-border); display: none; }
     .vv2-summary-block-body.open { display: block; }
     .vv2-expand-arrow { font-size: 10px; color: var(--vv-cream-dim); transition: transform 0.2s; }
     .vv2-summary-block.open .vv2-expand-arrow { transform: rotate(180deg); }
 
     /* ── Important moments ── */
     .vv2-moments-grid { display: flex; flex-direction: column; gap: 7px; }
-    .vv2-moment-item { background: var(--vv-bg3); border: 1px solid var(--vv-border); border-radius: var(--vv-r); padding: 9px 11px; }
+    .vv2-moment-item { background: var(--vv-bg3); border: 1px solid var(--vv-border); border-radius: var(--vv-r-md); padding: 10px 12px; }
     .vv2-moment-badge { display: inline-block; font-size: 9px; padding: 1px 6px; border-radius: 99px; font-weight: 600; margin-bottom: 4px; }
-    .vv2-moment-title { font-size: 12px; font-weight: 600; color: var(--vv-cream); margin-bottom: 2px; }
     .vv2-moment-ts { font-size: 10px; color: var(--vv-accent); float: right; font-variant-numeric: tabular-nums; }
+    .vv2-moment-title { font-size: 12px; font-weight: 600; color: var(--vv-cream); margin-bottom: 2px; }
     .vv2-moment-desc { font-size: 11px; color: var(--vv-cream-dim); line-height: 1.5; }
 
     /* ── Markdown ── */
@@ -278,15 +320,15 @@ function injectStyles() {
     .vv2-md-list { margin: 4px 0 4px 4px; padding: 0; list-style: none; }
     .vv2-md-list li { font-size: 13px; color: var(--vv-cream); line-height: 1.75; padding: 1px 0 1px 14px; position: relative; }
     .vv2-md-list li::before { content: '›'; position: absolute; left: 0; color: var(--vv-accent); font-weight: 700; }
-    .vv2-md-list li strong, .vv2-md-para strong { color: var(--vv-cream); font-weight: 600; }
+    .vv2-md-list li strong, .vv2-md-para strong { font-weight: 600; }
     .vv2-badge { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; }
-    .vv2-badge-warn { background: rgba(245,158,11,0.12); color: #F59E0B; border: 1px solid rgba(245,158,11,0.25); }
-    .vv2-badge-crit { background: rgba(239,68,68,0.10); color: #EF4444; border: 1px solid rgba(239,68,68,0.22); }
-    .vv2-badge-info { background: rgba(99,102,241,0.10); color: #818CF8; border: 1px solid rgba(99,102,241,0.22); }
+    .vv2-badge-warn { background: rgba(245,158,11,0.10); color: #F59E0B; border: 1px solid rgba(245,158,11,0.22); }
+    .vv2-badge-crit { background: rgba(239,68,68,0.08); color: #EF4444; border: 1px solid rgba(239,68,68,0.20); }
+    .vv2-badge-info { background: rgba(99,102,241,0.08); color: #818CF8; border: 1px solid rgba(99,102,241,0.20); }
 
     /* ── States ── */
-    .vv2-warn { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.18); border-radius: var(--vv-r); padding: 8px 11px; font-size: 11px; color: #F59E0B; margin-bottom: 6px; line-height: 1.5; }
-    .vv2-err  { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.20); border-radius: var(--vv-r); padding: 8px 11px; font-size: 11px; color: var(--vv-red); margin-bottom: 6px; line-height: 1.5; }
+    .vv2-warn { background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.16); border-radius: var(--vv-r); padding: 8px 11px; font-size: 11px; color: #F59E0B; margin-bottom: 6px; line-height: 1.5; }
+    .vv2-err  { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.18); border-radius: var(--vv-r); padding: 8px 11px; font-size: 11px; color: var(--vv-red); margin-bottom: 6px; line-height: 1.5; }
     .vv2-loading-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; }
     .vv2-loading-text { font-size: 12px; color: var(--vv-cream); font-weight: 500; }
     .vv2-loading-sub  { font-size: 11px; color: var(--vv-cream-dim); margin-top: 2px; }
@@ -297,11 +339,11 @@ function injectStyles() {
       width: 100%; padding: 10px 16px; background: var(--vv-accent); color: var(--vv-btn-text);
       border: none; border-radius: var(--vv-r-md); font-family: var(--vv-font);
       font-size: 13px; font-weight: 600; letter-spacing: 0.01em;
-      cursor: pointer; transition: filter 0.15s, transform 0.1s;
+      cursor: pointer; transition: filter 0.15s, transform 0.1s, box-shadow 0.15s;
     }
-    .vv2-btn-primary:hover { filter: brightness(1.08); }
+    .vv2-btn-primary:hover { filter: brightness(1.08); box-shadow: 0 4px 16px rgba(245,158,11,0.22); }
     .vv2-btn-primary:active { transform: scale(0.99); }
-    .vv2-btn-primary:disabled { opacity: 0.38; cursor: not-allowed; transform: none; filter: none; }
+    .vv2-btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; filter: none; box-shadow: none; }
     .vv2-btn-ghost {
       display: inline-flex; align-items: center; justify-content: center; gap: 6px;
       padding: 9px 14px; background: transparent; color: var(--vv-cream-dim);
@@ -309,7 +351,7 @@ function injectStyles() {
       font-family: var(--vv-font); font-size: 13px; font-weight: 500;
       cursor: pointer; transition: all 0.15s;
     }
-    .vv2-btn-ghost:hover { border-color: var(--vv-border2); color: var(--vv-cream); }
+    .vv2-btn-ghost:hover { border-color: var(--vv-border2); color: var(--vv-cream); background: var(--vv-bg3); }
     .vv2-regen {
       font-size: 11px; color: var(--vv-cream-dim); background: none; border: none;
       cursor: pointer; padding: 5px 0; margin-top: 6px; transition: color 0.15s;
@@ -328,8 +370,8 @@ function injectStyles() {
     .vv2-textarea::placeholder { color: var(--vv-cream-dim); opacity: 0.4; }
 
     /* ── Stars ── */
-    .vv2-stars { display: flex; gap: 3px; }
-    .vv2-star { cursor: pointer; font-size: 18px; color: var(--vv-star-empty); transition: color 0.1s, transform 0.1s; line-height: 1; user-select: none; }
+    .vv2-stars { display: flex; gap: 2px; }
+    .vv2-star { cursor: pointer; font-size: 16px; color: var(--vv-star-empty); transition: color 0.1s, transform 0.1s; line-height: 1; user-select: none; }
     .vv2-star:hover, .vv2-star.on { color: var(--vv-accent); }
     .vv2-star:hover { transform: scale(1.12); }
     .vv2-rating-row { display: flex; align-items: center; justify-content: space-between; }
@@ -338,7 +380,7 @@ function injectStyles() {
     /* ── Spinner ── */
     @keyframes vv2-spin { to { transform: rotate(360deg); } }
     .vv2-spinner {
-      width: 13px; height: 13px; border: 1.5px solid rgba(245,158,11,0.18);
+      width: 13px; height: 13px; border: 1.5px solid var(--vv-border2);
       border-top-color: var(--vv-accent); border-radius: 50%;
       animation: vv2-spin 0.7s linear infinite; flex-shrink: 0; display: inline-block;
     }
@@ -347,11 +389,12 @@ function injectStyles() {
     .vv2-footer {
       padding: 12px 18px 16px; border-top: 1px solid var(--vv-border);
       display: flex; gap: 8px; flex-shrink: 0;
+      background: var(--vv-bg2);
     }
 
     /* ── Success ── */
     .vv2-success { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 52px 24px; text-align: center; flex: 1; }
-    .vv2-success-icon { font-size: 38px; }
+    .vv2-success-icon { font-size: 36px; }
     .vv2-success-title { font-size: 16px; font-weight: 700; color: var(--vv-green); }
     .vv2-success-sub { font-size: 13px; color: var(--vv-cream-dim); line-height: 1.6; }
 
@@ -697,38 +740,54 @@ function buildPanelHTML({ title, channel, duration, thumb, existing, settings, f
 
   return `
     <div class="vv2-header">
-      <div class="vv2-logo">you<span style="color:var(--vv-accent);font-weight:800;">LIB</span></div>
-      <button class="vv2-close" id="vv2-close">✕</button>
+      <div class="vv2-logo">
+        <div class="vv2-logo-mark">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+          </svg>
+        </div>
+        <span class="vv2-logo-text">you<em>LIB</em></span>
+      </div>
+      <button class="vv2-close" id="vv2-close">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
     </div>
     <div class="vv2-body" id="vv2-body">
-      ${savedBanner}
+      ${savedBanner ? `<div class="vv2-body-section" style="padding-top:12px;padding-bottom:12px;">${savedBanner}</div>` : ''}
 
-      <div class="vv2-video-card">
-        <img class="vv2-thumb" src="${escHtml(thumb)}" alt=""
-          onerror="this.style.background='var(--vv-bg3)';this.removeAttribute('src')" />
-        <div class="vv2-video-info">
-          <div class="vv2-video-title">${escHtml(title)}</div>
-          <div class="vv2-channel">${escHtml(channel)}</div>
-          ${durationStr ? `<div class="vv2-duration">${durationStr}</div>` : ''}
+      <!-- Video card -->
+      <div class="vv2-body-section">
+        <div class="vv2-video-card">
+          <img class="vv2-thumb" src="${escHtml(thumb)}" alt=""
+            onerror="this.style.background='var(--vv-bg3)';this.removeAttribute('src')" />
+          <div class="vv2-video-info">
+            <div class="vv2-video-title">${escHtml(title)}</div>
+            <div class="vv2-channel">${escHtml(channel)}</div>
+            ${durationStr ? `<div class="vv2-duration">${durationStr}</div>` : ''}
+          </div>
         </div>
       </div>
 
-      <div class="vv2-settings-section">
+      <!-- Settings -->
+      <div class="vv2-body-section vv2-settings-section">
 
         <div>
           <div class="vv2-field-label">Özet Modu</div>
           <div class="vv2-radio-cards">
             <label class="vv2-radio-card" for="cb-short">
               <input type="radio" id="cb-short" name="summary-mode" value="short" ${radioChk('short')} />
-              <span class="vv2-radio-card-label">Kısa Özet</span>
+              <span class="vv2-radio-card-label">Kısa</span>
             </label>
             <label class="vv2-radio-card" for="cb-detailed">
               <input type="radio" id="cb-detailed" name="summary-mode" value="detailed" ${radioChk('detailed')} />
-              <span class="vv2-radio-card-label">Detaylı Özet</span>
+              <span class="vv2-radio-card-label">Detaylı</span>
             </label>
             <label class="vv2-radio-card" for="cb-report">
               <input type="radio" id="cb-report" name="summary-mode" value="report" ${radioChk('report')} />
-              <span class="vv2-radio-card-label">Profesyonel Rapor</span>
+              <span class="vv2-radio-card-label">Rapor</span>
             </label>
           </div>
         </div>
@@ -802,30 +861,44 @@ function buildPanelHTML({ title, channel, duration, thumb, existing, settings, f
 
       </div>
 
-      <div id="vv2-summary-section">
-        <div class="vv2-label">Yapay Zeka Çıktısı</div>
+      <!-- AI Output -->
+      <div class="vv2-body-section" id="vv2-summary-section">
+        <div class="vv2-field-label" style="margin-bottom:10px;">Yapay Zeka Çıktısı</div>
         <div id="vv2-summary-content">
-          <button class="vv2-btn-primary" id="vv2-gen-btn">Özet Oluştur</button>
+          <button class="vv2-btn-primary" id="vv2-gen-btn" style="width:100%;justify-content:center;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+            </svg>
+            Özet Oluştur
+          </button>
         </div>
       </div>
 
-      <div>
-        <div class="vv2-label">Notlarım</div>
+      <!-- Notes -->
+      <div class="vv2-body-section">
+        <div class="vv2-field-label" style="margin-bottom:8px;">Notlarım</div>
         <textarea class="vv2-textarea" id="vv2-note" rows="3"
           placeholder="Bu videoda şunu anlattı...">${escHtml(existing ? (existing.note || '') : '')}</textarea>
       </div>
 
-      <div>
-        <div class="vv2-label">Puan</div>
+      <!-- Rating -->
+      <div class="vv2-body-section" style="border-bottom:none;">
+        <div class="vv2-field-label" style="margin-bottom:8px;">Puan</div>
         <div class="vv2-rating-row">
           <div class="vv2-stars" id="vv2-stars"></div>
           <div class="vv2-rating-val" id="vv2-rating-val">—/10</div>
         </div>
       </div>
+
     </div>
     <div class="vv2-footer">
       <button class="vv2-btn-ghost" id="vv2-cancel-btn">İptal</button>
-      <button class="vv2-btn-primary" id="vv2-save-btn" style="flex:1;">Arşivle</button>
+      <button class="vv2-btn-primary" id="vv2-save-btn" style="flex:1;justify-content:center;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+        </svg>
+        Arşivle
+      </button>
     </div>`;
 }
 
@@ -1396,7 +1469,7 @@ function injectButton() {
   if (document.getElementById('vv2-btn')) return;
   const btn = document.createElement('button');
   btn.id = 'vv2-btn';
-  btn.innerHTML = '<span class="vv2-btn-icon">▣</span><span class="vv2-btn-label">Arşivle</span>';
+  btn.innerHTML = `<span class="vv2-btn-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span><span class="vv2-btn-label">Arşivle</span>`;
   btn.addEventListener('click', openPanel);
   document.body.appendChild(btn);
 }

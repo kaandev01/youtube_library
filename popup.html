@@ -5,122 +5,243 @@
   <title>youLIB</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    body { width: 300px; padding: 0; font-family: Calibri, Arial, sans-serif; }
+    body {
+      width: 316px;
+      padding: 0;
+      overflow-x: hidden;
+      background: var(--bg);
+    }
 
-    .header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 16px 12px; border-bottom: 1px solid var(--border);
+    /* ── Header ── */
+    .pp-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 16px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
     }
-    .logo { display: flex; align-items: center; gap: 8px; }
-    .logo-icon {
-      width: 22px; height: 22px; background: var(--accent);
-      border-radius: 5px; display: flex; align-items: center;
-      justify-content: center; font-size: 12px;
+    .pp-logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
     }
-    .logo-text {
-      font-size: 16px; font-weight: 700;
-      color: var(--cream); letter-spacing: 0.01em;
+    .pp-logo-mark {
+      width: 22px; height: 22px;
+      background: var(--accent);
+      border-radius: 6px;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
     }
-    .version-tag {
+    .pp-logo-text {
+      font-size: 15px; font-weight: 700;
+      color: var(--cream); letter-spacing: -0.025em;
+    }
+    .pp-logo-text em { color: var(--accent); font-style: normal; }
+    .pp-version {
       font-family: var(--font-mono);
       font-size: 9px; color: var(--cream-dim);
-      background: var(--bg3); border: 1px solid var(--border);
-      border-radius: 4px; padding: 1px 5px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 6px;
+      letter-spacing: 0.04em;
     }
 
-    .section { padding: 14px 16px; }
-    .section + .section { border-top: 1px solid var(--border); }
-
-    .hint {
-      font-size: 11px; color: var(--cream-dim);
-      line-height: 1.6; margin-bottom: 12px;
+    /* ── Stats ── */
+    .pp-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 14px 14px 0;
     }
-    .hint strong { color: var(--accent); }
+    .pp-stat {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 11px 10px 10px;
+      text-align: center;
+      transition: border-color 0.15s;
+    }
+    .pp-stat-val {
+      font-size: 21px; font-weight: 700;
+      color: var(--accent); line-height: 1;
+      letter-spacing: -0.03em;
+    }
+    .pp-stat-label {
+      font-size: 9px; font-weight: 600;
+      color: var(--cream-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-top: 4px;
+    }
 
-    .settings-label {
+    /* ── CTA ── */
+    .pp-cta { padding: 12px 14px; }
+    .pp-cta .btn {
+      width: 100%;
+      justify-content: center;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius-lg);
+      gap: 8px;
+    }
+    .pp-cta .btn svg { flex-shrink: 0; }
+
+    /* ── Divider ── */
+    .pp-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+    /* ── Hint ── */
+    .pp-hint {
+      padding: 13px 14px 12px;
+      font-size: 11px;
+      color: var(--cream-dim);
+      line-height: 1.65;
+      border-top: 1px solid var(--border);
+    }
+    .pp-hint strong { color: var(--cream-mid); font-weight: 500; }
+
+    /* ── Section ── */
+    .pp-section {
+      padding: 13px 14px;
+      border-top: 1px solid var(--border);
+    }
+    .pp-section-label {
+      font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--cream-dim); margin-bottom: 9px;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .pp-section-badge {
+      font-size: 9px; font-weight: 600;
+      color: var(--green);
+      background: rgba(34,197,94,0.07);
+      border: 1px solid rgba(34,197,94,0.18);
+      border-radius: 99px;
+      padding: 1px 6px;
+      text-transform: none;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── Key form ── */
+    .pp-key-link {
+      display: block;
+      font-size: 11px;
+      color: var(--cream-dim);
+      margin-bottom: 8px;
+    }
+    .pp-key-link a { color: var(--accent); text-decoration: none; }
+    .pp-key-link a:hover { text-decoration: underline; }
+    .pp-key-row { display: flex; gap: 6px; }
+    .pp-key-row input {
+      flex: 1;
       font-family: var(--font-mono);
-      font-size: 10px; text-transform: uppercase;
-      letter-spacing: 0.08em; color: var(--cream-dim); margin-bottom: 4px;
+      font-size: 11px;
+      padding: 8px 10px;
+      letter-spacing: 0.03em;
     }
-    .key-hint {
-      font-size: 11px; color: var(--cream-dim);
-      opacity: 0.65; margin-bottom: 6px;
+    .pp-key-row .btn {
+      padding: 8px 12px;
+      font-size: 11px;
+      flex-shrink: 0;
     }
-    .key-hint a { color: var(--accent); text-decoration: none; }
-    .key-row { display: flex; gap: 6px; }
-    .key-row input { flex: 1; font-family: var(--font-mono); font-size: 11px; padding: 7px 10px; }
-    .key-row .btn { padding: 7px 10px; font-size: 11px; }
-    .saved-msg {
+    .pp-saved-msg {
+      font-size: 10px;
+      color: var(--green);
+      margin-top: 5px;
+      height: 14px;
       font-family: var(--font-mono);
-      font-size: 10px; color: var(--green);
-      margin-top: 5px; height: 14px;
-    }
-
-    .stat-row { display: flex; gap: 8px; margin-bottom: 12px; }
-    .stat { flex: 1; text-align: center; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 4px; }
-    .stat-n { font-size: 22px; font-weight: 700; color: var(--accent); line-height: 1; }
-    .stat-l {
-      font-family: var(--font-mono);
-      font-size: 9px; color: var(--cream-dim);
-      text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px;
     }
   </style>
 </head>
 <body>
-  <div class="header">
-    <div class="logo">
-      <div class="logo-icon">📼</div>
-      <span class="logo-text">you<span id="logo-accent" style="color:var(--accent)">LIB</span></span>
+
+  <!-- Header -->
+  <div class="pp-header">
+    <div class="pp-logo">
+      <div class="pp-logo-mark">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#09090E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+        </svg>
+      </div>
+      <span class="pp-logo-text">you<em>LIB</em></span>
     </div>
-    <span class="version-tag">v2.0</span>
+    <span class="pp-version">v2.0</span>
   </div>
 
-  <!-- Stats + Library -->
-  <div class="section" id="stats-section">
-    <div class="stat-row">
-      <div class="stat"><div class="stat-n" id="s-total">0</div><div class="stat-l">Video</div></div>
-      <div class="stat"><div class="stat-n" id="s-avg">—</div><div class="stat-l">Ort. Puan</div></div>
-      <div class="stat"><div class="stat-n" id="s-folders">0</div><div class="stat-l">Klasör</div></div>
+  <!-- Stats -->
+  <div class="pp-stats">
+    <div class="pp-stat">
+      <div class="pp-stat-val" id="s-total">0</div>
+      <div class="pp-stat-label">Video</div>
     </div>
-    <button class="btn btn-primary" id="btn-library" style="width:100%;">📚 Kütüphaneyi Aç</button>
+    <div class="pp-stat">
+      <div class="pp-stat-val" id="s-avg">—</div>
+      <div class="pp-stat-label">Puan</div>
+    </div>
+    <div class="pp-stat">
+      <div class="pp-stat-val" id="s-folders">0</div>
+      <div class="pp-stat-label">Klasör</div>
+    </div>
   </div>
 
-  <!-- Usage hint -->
-  <div class="section">
-    <div class="hint">
-      YouTube'da video izlerken sağda beliren <strong>📼 Arşivle</strong> butonuna tıkla — özet türü seç, dil belirle, klasöre ata ve kaydet.
-    </div>
+  <!-- Library CTA -->
+  <div class="pp-cta">
+    <button class="btn btn-primary" id="btn-library">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+      Kütüphaneyi Aç
+    </button>
+  </div>
+
+  <!-- Hint -->
+  <div class="pp-hint">
+    YouTube'da video izlerken sağda beliren <strong>youLIB</strong> butonuna tıkla — özet türünü seç, dil belirle, klasöre ata ve arşivle.
   </div>
 
   <!-- Theme -->
-  <div class="section">
-    <div class="settings-label">Tema</div>
-    <div class="theme-toggle-row" style="margin-top:6px;">
-      <button class="theme-btn" id="theme-amber" data-theme="amber">🟡 Amber</button>
-      <button class="theme-btn" id="theme-mono" data-theme="mono">⚪ Mono</button>
+  <div class="pp-section">
+    <div class="pp-section-label">Tema</div>
+    <div class="theme-toggle-row">
+      <button class="theme-btn" data-theme="amber">Amber</button>
+      <button class="theme-btn" data-theme="mono">Açık</button>
     </div>
   </div>
 
-  <!-- Groq Key -->
-  <div class="section">
-    <div class="settings-label">Groq API Key <span style="color:var(--green);font-size:9px;">(AI Özeti — Ücretsiz)</span></div>
-    <div class="key-hint">→ <a href="https://console.groq.com/keys" target="_blank">console.groq.com/keys</a></div>
-    <div class="key-row">
+  <!-- Groq API Key -->
+  <div class="pp-section">
+    <div class="pp-section-label">
+      Groq API Key
+      <span class="pp-section-badge">Ücretsiz</span>
+    </div>
+    <span class="pp-key-link">
+      <a href="https://console.groq.com/keys" target="_blank">console.groq.com/keys</a>
+    </span>
+    <div class="pp-key-row">
       <input type="password" id="api-key-input" placeholder="gsk_..." />
-      <button class="btn btn-primary" id="btn-save-key">Kaydet</button>
+      <button class="btn btn-ghost" id="btn-save-key">Kaydet</button>
     </div>
-    <div class="saved-msg" id="saved-msg"></div>
+    <div class="pp-saved-msg" id="saved-msg"></div>
   </div>
 
-  <!-- Supadata Key -->
-  <div class="section">
-    <div class="settings-label">Supadata API Key <span style="color:var(--green);font-size:9px;">(Transkript — Ücretsiz)</span></div>
-    <div class="key-hint">→ <a href="https://supadata.ai/dashboard" target="_blank">supadata.ai/dashboard</a></div>
-    <div class="key-row">
-      <input type="password" id="supadata-key-input" placeholder="sup_..." />
-      <button class="btn btn-primary" id="btn-save-supadata">Kaydet</button>
+  <!-- Supadata API Key -->
+  <div class="pp-section">
+    <div class="pp-section-label">
+      Supadata API Key
+      <span class="pp-section-badge">Ücretsiz</span>
     </div>
-    <div class="saved-msg" id="supadata-saved-msg"></div>
+    <span class="pp-key-link">
+      <a href="https://supadata.ai/dashboard" target="_blank">supadata.ai/dashboard</a>
+    </span>
+    <div class="pp-key-row">
+      <input type="password" id="supadata-key-input" placeholder="sup_..." />
+      <button class="btn btn-ghost" id="btn-save-supadata">Kaydet</button>
+    </div>
+    <div class="pp-saved-msg" id="supadata-saved-msg"></div>
   </div>
 
   <script src="popup.js"></script>

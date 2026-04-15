@@ -1,64 +1,80 @@
-/* youLIB v2 — Shared Styles — Theme-aware */
+/* youLIB v2 — Shared Design System */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-/* ── Fonts ── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-/* ── Default (Amber) Theme ── */
+/* ── Amber (Dark) Theme ── */
 :root,
 html[data-theme="amber"] {
-  --bg: #0C0C10;
-  --bg2: #111118;
-  --bg3: #18181F;
-  --border: #252530;
-  --border2: #363648;
-  --accent: #F59E0B;
-  --accent-dim: #B97A08;
-  --accent-glow: rgba(245, 158, 11, 0.10);
-  --accent-glow-strong: rgba(245, 158, 11, 0.20);
+  --bg:   #09090E;
+  --bg2:  #0D0D14;
+  --bg3:  #121219;
+  --bg4:  #181820;
+  --border:  #1C1C28;
+  --border2: #2A2A3C;
+  --accent:       #F59E0B;
+  --accent-dim:   #B97A08;
+  --accent-glow:        rgba(245, 158, 11, 0.08);
+  --accent-glow-strong: rgba(245, 158, 11, 0.18);
   /* Legacy compat */
-  --amber: #F59E0B;
-  --amber-dim: #B97A08;
-  --amber-glow: rgba(245, 158, 11, 0.10);
-  --cream: #E4DFD5;
-  --cream-dim: #6E6A63;
-  --red: #EF4444;
+  --amber:      #F59E0B;
+  --amber-dim:  #B97A08;
+  --amber-glow: rgba(245, 158, 11, 0.08);
+  --cream:     #E6E1D9;
+  --cream-mid: #8A857E;
+  --cream-dim: #52504C;
+  --red:   #EF4444;
   --green: #22C55E;
-  --blue: #60A5FA;
-  --radius: 7px;
+  --blue:  #60A5FA;
+  --radius-sm: 5px;
+  --radius:    8px;
   --radius-lg: 12px;
-  --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --radius-xl: 16px;
+  --font:      'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, 'Courier New', monospace;
-  --btn-text: #0C0C10;
-  --star-empty: #2A2A38;
-  --hr-color: #252530;
-  --shadow-accent: 0 4px 20px rgba(245, 158, 11, 0.18);
-  --shadow-accent-hover: 0 6px 28px rgba(245, 158, 11, 0.32);
+  --btn-text:   #09090E;
+  --star-empty: #1E1E2A;
+  --hr-color:   #1C1C28;
+  --shadow-sm:  0 1px 4px rgba(0,0,0,0.4);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.5);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.6);
+  --shadow-accent:       0 4px 20px rgba(245, 158, 11, 0.14);
+  --shadow-accent-hover: 0 6px 28px rgba(245, 158, 11, 0.26);
 }
 
-/* ── Mono (Light/White) Theme ── */
+/* ── Mono (Light / White) Theme ── */
 html[data-theme="mono"] {
-  --bg: #F4F4F4;
-  --bg2: #FFFFFF;
-  --bg3: #EBEBEB;
-  --border: #DCDCDC;
-  --border2: #C4C4C4;
-  --accent: #1A1A1A;
-  --accent-dim: #555555;
-  --accent-glow: rgba(26, 26, 26, 0.06);
+  --bg:   #F3F3F3;
+  --bg2:  #FFFFFF;
+  --bg3:  #EAEAEA;
+  --bg4:  #E1E1E1;
+  --border:  #DADADA;
+  --border2: #C2C2C2;
+  --accent:       #1A1A1A;
+  --accent-dim:   #555555;
+  --accent-glow:        rgba(26, 26, 26, 0.06);
   --accent-glow-strong: rgba(26, 26, 26, 0.12);
-  --amber: #1A1A1A;
-  --amber-dim: #555555;
+  --amber:      #1A1A1A;
+  --amber-dim:  #555555;
   --amber-glow: rgba(26, 26, 26, 0.06);
-  --cream: #111111;
-  --cream-dim: #666666;
-  --red: #DC2626;
+  --cream:     #0F0F0F;
+  --cream-mid: #555555;
+  --cream-dim: #909090;
+  --red:   #DC2626;
   --green: #16A34A;
-  --blue: #2563EB;
-  --btn-text: #FFFFFF;
-  --star-empty: #CCCCCC;
-  --hr-color: #DCDCDC;
-  --shadow-accent: 0 4px 20px rgba(0, 0, 0, 0.08);
-  --shadow-accent-hover: 0 6px 28px rgba(0, 0, 0, 0.16);
+  --blue:  #2563EB;
+  --radius-sm: 5px;
+  --radius:    8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --font:      'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, 'Courier New', monospace;
+  --btn-text:   #FFFFFF;
+  --star-empty: #D0D0D0;
+  --hr-color:   #DADADA;
+  --shadow-sm:  0 1px 4px rgba(0,0,0,0.06);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.10);
+  --shadow-accent:       0 4px 20px rgba(0,0,0,0.08);
+  --shadow-accent-hover: 0 6px 28px rgba(0,0,0,0.14);
 }
 
 /* ── Base Reset ── */
@@ -78,20 +94,17 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
-h1, h2, h3 {
-  font-family: var(--font);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
+h1, h2, h3 { font-family: var(--font); font-weight: 700; letter-spacing: -0.025em; }
 .mono { font-family: var(--font-mono); font-size: 11px; }
 
-/* ── Buttons ── */
+/* ─────────────────────────────────────
+   BUTTONS
+───────────────────────────────────── */
 .btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 14px;
+  padding: 8px 16px;
   border-radius: var(--radius);
   border: 1px solid transparent;
   font-family: var(--font);
@@ -101,6 +114,7 @@ h1, h2, h3 {
   transition: all 0.15s ease;
   white-space: nowrap;
   letter-spacing: 0.01em;
+  line-height: 1;
 }
 .btn-primary {
   background: var(--accent);
@@ -108,23 +122,41 @@ h1, h2, h3 {
   border-color: var(--accent);
   font-weight: 600;
 }
-.btn-primary:hover { filter: brightness(1.08); }
-.btn-primary:active { filter: brightness(0.96); }
+.btn-primary:hover {
+  filter: brightness(1.08);
+  box-shadow: var(--shadow-accent);
+}
+.btn-primary:active { filter: brightness(0.96); transform: scale(0.99); }
 .btn-ghost {
   background: transparent;
-  color: var(--cream-dim);
+  color: var(--cream-mid);
   border-color: var(--border);
 }
-.btn-ghost:hover { border-color: var(--border2); color: var(--cream); }
+.btn-ghost:hover {
+  border-color: var(--border2);
+  color: var(--cream);
+  background: var(--bg3);
+}
 .btn-danger {
   background: transparent;
   color: var(--red);
-  border-color: rgba(239,68,68,0.25);
+  border-color: rgba(239, 68, 68, 0.18);
 }
-.btn-danger:hover { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.4); }
-.btn:disabled { opacity: 0.38; cursor: not-allowed; transform: none !important; filter: none !important; }
+.btn-danger:hover {
+  background: rgba(239, 68, 68, 0.06);
+  border-color: rgba(239, 68, 68, 0.32);
+}
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none !important;
+  filter: none !important;
+  box-shadow: none !important;
+}
 
-/* ── Inputs ── */
+/* ─────────────────────────────────────
+   INPUTS
+───────────────────────────────────── */
 textarea,
 input[type="text"],
 input[type="password"],
@@ -142,9 +174,11 @@ select.themed {
   outline: none;
 }
 textarea:focus, input:focus, select.themed:focus { border-color: var(--accent); }
-textarea::placeholder, input::placeholder { color: var(--cream-dim); opacity: 0.45; }
+textarea::placeholder, input::placeholder { color: var(--cream-dim); opacity: 0.5; }
 
-/* ── Stars ── */
+/* ─────────────────────────────────────
+   STARS
+───────────────────────────────────── */
 .rating-row { display: flex; gap: 4px; align-items: center; }
 .star {
   cursor: pointer;
@@ -156,24 +190,28 @@ textarea::placeholder, input::placeholder { color: var(--cream-dim); opacity: 0.
 .star:hover, .star.active { color: var(--accent); }
 .star:hover { transform: scale(1.12); }
 
-/* ── Badge ── */
+/* ─────────────────────────────────────
+   BADGES
+───────────────────────────────────── */
 .badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 7px;
+  padding: 2px 8px;
   border-radius: 99px;
-  font-family: var(--font-mono);
+  font-family: var(--font);
   font-size: 10px;
   font-weight: 500;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
 }
-.badge-amber { background: var(--accent-glow); color: var(--accent); border: 1px solid var(--accent-dim); opacity: 0.9; }
-.badge-green { background: rgba(34,197,94,0.08); color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
-.badge-dim   { background: var(--bg3); color: var(--cream-dim); border: 1px solid var(--border); }
-.badge-folder { background: var(--accent-glow); color: var(--accent); border: 1px solid var(--accent-dim); opacity: 0.8; }
+.badge-amber  { background: var(--accent-glow); color: var(--accent); border: 1px solid var(--accent-dim); }
+.badge-green  { background: rgba(34,197,94,0.07); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+.badge-dim    { background: var(--bg3); color: var(--cream-mid); border: 1px solid var(--border); }
+.badge-folder { background: var(--accent-glow); color: var(--accent); border: 1px solid var(--accent-dim); font-size: 9px; letter-spacing: 0.05em; text-transform: uppercase; }
 
-/* ── Spinner ── */
+/* ─────────────────────────────────────
+   SPINNER
+───────────────────────────────────── */
 @keyframes spin { to { transform: rotate(360deg); } }
 .spinner {
   width: 14px; height: 14px;
@@ -184,75 +222,46 @@ textarea::placeholder, input::placeholder { color: var(--cream-dim); opacity: 0.
   flex-shrink: 0;
 }
 
-/* ── Fade in ── */
+/* ─────────────────────────────────────
+   ANIMATIONS
+───────────────────────────────────── */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.fade-up { animation: fadeUp 0.25s ease forwards; }
+.fade-up { animation: fadeUp 0.22s ease forwards; }
 
-/* ── Collapsible ── */
+/* ─────────────────────────────────────
+   COLLAPSIBLE
+───────────────────────────────────── */
 .collapsible-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  user-select: none;
-  padding: 4px 0;
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer; user-select: none; padding: 4px 0;
 }
-.collapsible-toggle .toggle-arrow {
-  font-size: 10px;
-  color: var(--cream-dim);
-  transition: transform 0.2s;
-}
+.collapsible-toggle .toggle-arrow { font-size: 10px; color: var(--cream-dim); transition: transform 0.2s; }
 .collapsible-toggle.open .toggle-arrow { transform: rotate(180deg); }
-.collapsible-body {
-  overflow: hidden;
-  max-height: 0;
-  transition: max-height 0.3s ease;
-}
+.collapsible-body { overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
 .collapsible-body.open { max-height: 9999px; }
 
-/* ── Checkbox ── */
-.vv-checkbox-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 0;
-  cursor: pointer;
-}
-.vv-checkbox-row input[type="checkbox"] {
-  width: 14px; height: 14px;
-  accent-color: var(--accent);
-  cursor: pointer;
-  flex-shrink: 0;
-}
-.vv-checkbox-row label {
-  font-size: 13px;
-  color: var(--cream);
-  cursor: pointer;
-  line-height: 1.4;
-}
-.vv-checkbox-row label small {
-  display: block;
-  font-size: 10px;
-  color: var(--cream-dim);
-  font-family: var(--font-mono);
-  margin-top: 1px;
-}
+/* ─────────────────────────────────────
+   CHECKBOX
+───────────────────────────────────── */
+.vv-checkbox-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; cursor: pointer; }
+.vv-checkbox-row input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+.vv-checkbox-row label { font-size: 13px; color: var(--cream); cursor: pointer; line-height: 1.4; }
+.vv-checkbox-row label small { display: block; font-size: 10px; color: var(--cream-dim); font-family: var(--font-mono); margin-top: 1px; }
 
-/* ── Theme Toggle ── */
-.theme-toggle-row {
-  display: flex;
-  gap: 6px;
-}
+/* ─────────────────────────────────────
+   THEME TOGGLE
+───────────────────────────────────── */
+.theme-toggle-row { display: flex; gap: 4px; }
 .theme-btn {
   flex: 1;
-  padding: 7px 10px;
+  padding: 7px 12px;
   border-radius: var(--radius);
   border: 1px solid var(--border);
   background: transparent;
-  color: var(--cream-dim);
+  color: var(--cream-mid);
   font-family: var(--font);
   font-size: 11px;
   font-weight: 500;
@@ -268,3 +277,17 @@ textarea::placeholder, input::placeholder { color: var(--cream-dim); opacity: 0.
   color: var(--accent);
   font-weight: 600;
 }
+
+/* ─────────────────────────────────────
+   FORM FIELD UTILITIES
+───────────────────────────────────── */
+.form-field { display: flex; flex-direction: column; gap: 6px; }
+.form-label {
+  font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--cream-dim);
+}
+.form-hint { font-size: 11px; color: var(--cream-dim); opacity: 0.7; line-height: 1.5; }
+.form-hint a { color: var(--accent); text-decoration: none; }
+.form-hint a:hover { text-decoration: underline; }
+.form-row { display: flex; gap: 6px; align-items: flex-end; }
