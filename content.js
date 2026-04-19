@@ -176,7 +176,7 @@ function injectStyles() {
     .vv2-settings-section { display: flex; flex-direction: column; gap: 16px; }
 
     /* ── Radio cards ── */
-    .vv2-radio-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+    .vv2-radio-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; }
     .vv2-radio-card { position: relative; cursor: pointer; }
     .vv2-radio-card input[type="radio"] { position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0; }
     .vv2-radio-card-label {
@@ -401,6 +401,85 @@ function injectStyles() {
     /* ── Progress ── */
     .vv2-progress-bar { height: 2px; background: var(--vv-border); border-radius: 2px; margin-top: 7px; overflow: hidden; }
     .vv2-progress-fill { height: 100%; background: var(--vv-accent); border-radius: 2px; transition: width 0.4s ease; width: 0%; }
+
+    /* ── Visual notes ── */
+    .vv2-drop-zone {
+      margin-top: 8px; border: 1.5px dashed var(--vv-border2);
+      border-radius: var(--vv-r-md); padding: 13px 12px; text-align: center;
+      transition: border-color 0.15s, background 0.15s; cursor: default;
+    }
+    .vv2-drop-zone.drag-over { border-color: var(--vv-accent); background: var(--vv-accent-glow); }
+    .vv2-drop-hint {
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+      flex-wrap: wrap; font-size: 12px; color: var(--vv-cream-dim); line-height: 1.8;
+      font-family: var(--vv-font);
+    }
+    .vv2-drop-hint kbd {
+      font-family: var(--vv-font); font-size: 10px; padding: 1px 5px;
+      background: var(--vv-bg3); border: 1px solid var(--vv-border2);
+      border-radius: 3px; color: var(--vv-cream-dim); line-height: 1.6;
+    }
+    .vv2-file-link {
+      color: var(--vv-accent); cursor: pointer; font-weight: 500;
+      text-decoration: underline; text-underline-offset: 2px;
+    }
+    .vv2-file-link:hover { opacity: 0.75; }
+    .vv2-vn-limit { font-size: 11px; color: var(--vv-cream-dim); margin-top: 4px; opacity: 0.7; }
+    .vv2-visual-notes { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; min-height: 0; }
+    .vv2-vn-thumb {
+      position: relative; cursor: pointer; flex-shrink: 0;
+      border-radius: 6px; overflow: hidden; width: 88px; height: 56px;
+      border: 1px solid var(--vv-border); transition: border-color 0.15s, transform 0.1s;
+    }
+    .vv2-vn-thumb:hover { border-color: var(--vv-accent); transform: scale(1.04); }
+    .vv2-vn-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .vv2-vn-ts {
+      position: absolute; bottom: 3px; left: 3px;
+      background: rgba(0,0,0,0.72); color: #fff;
+      font-size: 9px; padding: 1px 4px; border-radius: 3px;
+      font-family: var(--vv-font); letter-spacing: 0.02em; pointer-events: none;
+    }
+    .vv2-vn-del {
+      position: absolute; top: 3px; right: 3px;
+      background: rgba(200,40,40,0.88); color: #fff; border: none;
+      border-radius: 3px; width: 16px; height: 16px; font-size: 14px; line-height: 1;
+      cursor: pointer; display: none; align-items: center; justify-content: center; padding: 0;
+    }
+    .vv2-vn-thumb:hover .vv2-vn-del { display: flex; }
+    .vv2-lightbox {
+      position: fixed; inset: 0; z-index: 2147483647;
+      background: rgba(0,0,0,0.96); display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 10px; padding: 14px;
+    }
+    .vv2-lb-stage {
+      flex: 1 1 auto; width: 100%;
+      display: flex; align-items: center; justify-content: center;
+      overflow: auto; max-height: calc(100vh - 120px);
+    }
+    .vv2-lightbox img {
+      max-width: 96vw; max-height: 88vh;
+      border-radius: 6px; box-shadow: 0 8px 48px rgba(0,0,0,0.8);
+      object-fit: contain; cursor: zoom-in;
+      image-rendering: -webkit-optimize-contrast;
+    }
+    .vv2-lightbox.zoomed .vv2-lb-stage { justify-content: flex-start; align-items: flex-start; }
+    .vv2-lightbox.zoomed img {
+      max-width: none; max-height: none;
+      width: auto; height: auto; cursor: zoom-out;
+    }
+    .vv2-lb-meta { display: flex; flex-direction: column; align-items: center; gap: 8px; max-width: min(92vw, 750px); flex-shrink: 0; }
+    .vv2-lb-ts {
+      background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.9);
+      font-size: 12px; padding: 3px 12px; border-radius: 20px;
+      font-family: var(--vv-font); letter-spacing: 0.04em;
+    }
+    .vv2-lb-note { color: rgba(255,255,255,0.8); font-size: 13px; text-align: center; font-family: var(--vv-font); line-height: 1.65; margin: 0; }
+    .vv2-lb-close {
+      position: absolute; top: 14px; right: 18px;
+      background: none; border: none; color: rgba(255,255,255,0.5);
+      font-size: 30px; cursor: pointer; line-height: 1; padding: 4px; transition: color 0.15s;
+    }
+    .vv2-lb-close:hover { color: #fff; }
   `;
   document.head.appendChild(style);
 }
@@ -424,6 +503,15 @@ function getChannelName() {
 }
 function getDuration() { return Math.round(document.querySelector('video')?.duration || 0); }
 function escHtml(str)  { return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtTime(sec)  {
+  const s = Math.round(sec || 0);
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const ss = s % 60;
+  return h > 0
+    ? `${h}:${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`
+    : `${m}:${String(ss).padStart(2,'0')}`;
+}
 
 // ── Storage ──
 function getArchive()   { return new Promise(r => chrome.storage.local.get('archive', d => r(d.archive || []))); }
@@ -433,6 +521,20 @@ function getApiKey()    { return new Promise(r => chrome.storage.local.get('apiK
 function getSupadataKey(){ return new Promise(r => chrome.storage.local.get('supadataKey', d => r((d.supadataKey || '').trim()))); }
 
 function saveArchiveData(archive) { return new Promise(r => chrome.storage.local.set({ archive }, r)); }
+
+// ── Note drafts (videoId → draft text) ──
+function getNoteDrafts() { return new Promise(r => chrome.storage.local.get('noteDrafts', d => r(d.noteDrafts || {}))); }
+async function saveNoteDraft(videoId, text) {
+  const drafts = await getNoteDrafts();
+  if (text) drafts[videoId] = text;
+  else delete drafts[videoId];
+  return new Promise(r => chrome.storage.local.set({ noteDrafts: drafts }, r));
+}
+function clearNoteDraft(videoId) { return saveNoteDraft(videoId, ''); }
+
+// ── Visual notes (videoId → [{id, timestamp, imageData, noteText, capturedAt}]) ──
+function getVisualNotes() { return new Promise(r => chrome.storage.local.get('visualNotes', d => r(d.visualNotes || {}))); }
+function saveVisualNotes(data) { return new Promise(r => chrome.storage.local.set({ visualNotes: data }, r)); }
 
 // ── Caption/Transcript infrastructure (preserved from v1) ──
 function injectCaptionMonitor() {
@@ -466,6 +568,30 @@ function readTracksViaEvent(ms=4000) {
   });
 }
 
+// Build timestamp-aware transcript string. Inserts [M:SS] markers every ~20s so
+// time-blocked prompt can map content to time ranges. Short/detailed prompts
+// can ignore these markers safely — they read as inline metadata.
+function eventsToTimedText(events, markerEveryMs = 20000) {
+  const lines = [];
+  let nextMarkerMs = 0;
+  for (const e of events) {
+    if (!e.segs) continue;
+    const ms   = typeof e.tStartMs === 'number' ? e.tStartMs : 0;
+    const text = e.segs.map(s => s.utf8 || '').join('').replace(/\s+/g, ' ').trim();
+    if (!text) continue;
+    if (ms >= nextMarkerMs) {
+      const totalSec = Math.floor(ms / 1000);
+      const m = Math.floor(totalSec / 60);
+      const s = totalSec % 60;
+      lines.push(`[${m}:${String(s).padStart(2,'0')}] ${text}`);
+      nextMarkerMs = ms + markerEveryMs;
+    } else {
+      lines.push(text);
+    }
+  }
+  return lines.join(' ').replace(/\s+/g, ' ').trim();
+}
+
 async function fetchTextFromTracks(tracks) {
   const track = tracks.find(c=>c.languageCode==='tr') || tracks.find(c=>c.languageCode==='en') || tracks.find(c=>c.kind!=='asr') || tracks[0];
   if (!track||!track.baseUrl) return null;
@@ -473,7 +599,7 @@ async function fetchTextFromTracks(tracks) {
     const res = await fetch(track.baseUrl+'&fmt=json3');
     if (!res.ok) return null;
     const data = await res.json();
-    const text = (data.events||[]).filter(e=>e.segs).map(e=>e.segs.map(s=>s.utf8||'').join('')).join(' ').replace(/\s+/g,' ').trim();
+    const text = eventsToTimedText(data.events || []);
     return text.length>80?text:null;
   } catch(_){return null;}
 }
@@ -533,7 +659,7 @@ async function fetchTranscript() {
       const res = await fetch(url); if(!res.ok)continue;
       const data = await res.json();
       if(!data||!data.events||data.events.length<5)continue;
-      const text = data.events.filter(e=>e.segs).map(e=>e.segs.map(s=>s.utf8||'').join('')).join(' ').replace(/\s+/g,' ').trim();
+      const text = eventsToTimedText(data.events);
       if(text.length>80)return text;
     }catch(_){}
   }
@@ -636,28 +762,61 @@ ${trPart}`;
 
 function buildTimeBlockedPrompt(title, channel, transcript, lang, blockMinutes, durationSec) {
   const langInstr = LANG_INSTRUCTIONS[lang] || LANG_INSTRUCTIONS['tr'];
-  const totalMin  = Math.ceil((durationSec || 600) / 60);
-  const blocks    = [];
-  for (let start = 0; start < totalMin; start += blockMinutes) {
-    const end = Math.min(start + blockMinutes, totalMin);
-    blocks.push(`${start}:00–${end}:00`);
+  const totalMin  = Math.max(1, Math.ceil((durationSec || 0) / 60));
+
+  // Compute time ranges as "M:SS – M:SS"
+  const fmt = (totalSec) => {
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    return `${m}:${String(s).padStart(2,'0')}`;
+  };
+  const ranges = [];
+  for (let s = 0; s < totalMin * 60; s += blockMinutes * 60) {
+    const e = Math.min(s + blockMinutes * 60, totalMin * 60);
+    ranges.push(`${fmt(s)} – ${fmt(e)}`);
   }
 
-  const detailLevel = blockMinutes <= 3 ? 'çok detaylı (4-6 cümle)' : blockMinutes <= 5 ? 'orta detaylı (3-4 cümle)' : 'genel (2-3 cümle)';
-
   const trPart = transcript
-    ? `Transkript:\n${transcript.substring(0,18000)}`
-    : `(Transkript bulunamadı — başlık ve kanala göre tahmin yap ve zaman bloklarını kurgula.)`;
+    ? `Transkript (köşeli parantezli timestamp'ler her segmentin başlangıç zamanını verir — blokları bunlara göre ayır):\n${transcript.substring(0, 24000)}`
+    : `(Transkript bulunamadı — başlık ve kanaldan yola çıkarak mantıklı bir akış kurgula. Blokları tahmini olarak üret.)`;
 
   return `${langInstr}
 
-"${title}" başlıklı YouTube videosunu (Kanal: ${channel}, Süre: ~${totalMin} dakika) ${blockMinutes} dakikalık bloklara böl ve her blok için ${detailLevel} özet oluştur.
+Sen deneyimli bir öğretmensin. "${title}" (Kanal: ${channel}, Süre: ~${totalMin} dk) videosunu ${blockMinutes} dakikalık zaman bloklarına bölerek ÖĞRETİCİ şekilde anlat. Trading, eğitim ve teknik anlatımlarda öğreticiliği artır.
 
-Her blok için şu formatı kullan:
-## ⏱ [ZAMAN ARALIĞI]
-[O zaman aralığında anlatılan konuların özeti]
+▶ TEMEL KURALLAR
+1. Her blok için "**Bu bölümde ne anlatılıyor?**" başlığı ZORUNLU ve en az 3-5 cümleli öğretici bir paragraf olmalı. Tek cümle özet yasak.
+2. Aşağıdaki alt başlıklardan İÇERİĞE UYGUN OLANLARI seç. Hepsini kullanmak zorunda değilsin; içerikte yoksa atla. Sırayı koru:
+   • **Bunun sade Türkçesi** — teknik/jargon anlatımı günlük dile çevir
+   • **Konuşmacının ima ettiği ama açık söylemediği şey** — çıkarımsal içgörü varsa
+   • **Adım adım nasıl kullanılır?** — uygulanabilir adımlar varsa madde madde
+   • **Kritik nokta** veya **Dikkat** — önemli uyarı/vurgu
+   • **Sık karıştırılır** — karışma riski varsa ayrımı açıkla
+3. Bloklar birbirini TEKRAR ETMESİN. Her blok kendi içeriğini anlatsın.
+4. Kullanıcı videoyu izlemediyse bile konuyu anlayabilsin — bağlam ver.
+5. Timestamp'leri doğru kullan; transcript'teki [M:SS] marker'larına göre içeriği ilgili bloğa yerleştir.
 
-Toplam bloklar: ${blocks.join(' | ')}
+▶ ÇIKTI FORMATI (tam olarak bu yapıya uy)
+
+## ${ranges[0] || '0:00 – ?'}
+
+**Bu bölümde ne anlatılıyor?**
+[3-5 cümle öğretici paragraf]
+
+**[Uygun alt başlık]**
+[İçerik]
+
+**[Uygun alt başlık]**
+[İçerik]
+
+---
+
+## [Sonraki aralık]
+
+… (tüm bloklar için tekrarla)
+
+▶ ÜRETİLECEK BLOKLAR (tam bu sırayla ve aralıklarla):
+${ranges.map((r, i) => `${i+1}. ${r}`).join('\n')}
 
 ${trPart}`;
 }
@@ -731,7 +890,7 @@ function buildPanelHTML({ title, channel, duration, thumb, existing, settings, f
   const block = existing ? (existing.blockSizePreference || defaultBlock) : defaultBlock;
 
   // Radio: pick primary type (short/detailed/report), default to 'detailed'
-  const radioTypes  = ['short', 'detailed', 'report'];
+  const radioTypes  = ['short', 'detailed'];
   const primaryType = radioTypes.find(t => types.includes(t)) || 'detailed';
   function radioChk(t) { return t === primaryType ? 'checked' : ''; }
   const timeChecked = types.includes('timeBlocked') ? 'checked' : '';
@@ -784,10 +943,6 @@ function buildPanelHTML({ title, channel, duration, thumb, existing, settings, f
             <label class="vv2-radio-card" for="cb-detailed">
               <input type="radio" id="cb-detailed" name="summary-mode" value="detailed" ${radioChk('detailed')} />
               <span class="vv2-radio-card-label">Detaylı</span>
-            </label>
-            <label class="vv2-radio-card" for="cb-report">
-              <input type="radio" id="cb-report" name="summary-mode" value="report" ${radioChk('report')} />
-              <span class="vv2-radio-card-label">Rapor</span>
             </label>
           </div>
         </div>
@@ -879,6 +1034,15 @@ function buildPanelHTML({ title, channel, duration, thumb, existing, settings, f
         <div class="vv2-field-label" style="margin-bottom:8px;">Notlarım</div>
         <textarea class="vv2-textarea" id="vv2-note" rows="3"
           placeholder="Bu videoda şunu anlattı...">${escHtml(existing ? (existing.note || '') : '')}</textarea>
+        <div class="vv2-drop-zone" id="vv2-drop-zone">
+          <div class="vv2-drop-hint">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            Yapıştır <kbd>Ctrl+V</kbd>, sürükle veya
+            <label class="vv2-file-link" for="vv2-file-input">dosya seç</label>
+          </div>
+          <input type="file" id="vv2-file-input" accept="image/*" multiple style="display:none">
+        </div>
+        <div class="vv2-visual-notes" id="vv2-visual-notes"></div>
       </div>
 
       <!-- Rating -->
@@ -1052,7 +1216,7 @@ function wireFolderCreate() {
 }
 
 // ── Wire panel buttons ──
-function wirePanel(videoId, title, channel, url, thumb, duration, existing) {
+function wirePanel(videoId, title, channel, url, thumb, duration, existing, noteDraft) {
   const panel = document.getElementById('vv2-panel');
   if (panel) {
     panel.dataset.vid      = videoId;
@@ -1084,17 +1248,30 @@ function wirePanel(videoId, title, channel, url, thumb, duration, existing) {
       showExistingResults(sr, existing.importantMoments);
     }
   }
-  if (existing) {
-    if (existing.note) {
-      const noteEl = document.getElementById('vv2-note');
-      if (noteEl && !noteEl.value) noteEl.value = existing.note;
+  // Load note: draft (unsaved) takes priority over archived note
+  const noteEl = document.getElementById('vv2-note');
+  if (noteEl) {
+    if (noteDraft) {
+      noteEl.value = noteDraft;
+    } else if (existing && existing.note) {
+      noteEl.value = existing.note;
     }
+    // Debounced autosave — persists draft to storage 600 ms after user stops typing
+    let draftTimer;
+    noteEl.addEventListener('input', () => {
+      clearTimeout(draftTimer);
+      draftTimer = setTimeout(() => saveNoteDraft(videoId, noteEl.value), 600);
+    });
+  }
+
+  if (existing) {
     const saveBtn = document.getElementById('vv2-save-btn');
     if (saveBtn) saveBtn.textContent = '💾 Güncelle';
   }
 
   buildStars(currentRating);
   wireSaveButton({ videoId, title, channel, url, thumb, duration });
+  wireVisualNotes(videoId);
 }
 
 function showExistingResults(sr, moments) {
@@ -1164,7 +1341,7 @@ async function startGenerate() {
 
   // Collect selected types
   const selectedTypes = [];
-  ['short','detailed','report','timeBlocked'].forEach(type => {
+  ['short','detailed','timeBlocked'].forEach(type => {
     const cb = document.getElementById('cb-' + (type==='timeBlocked'?'time':type));
     if (cb && cb.checked) selectedTypes.push(type);
   });
@@ -1212,10 +1389,9 @@ async function startGenerate() {
   const prompts = {
     short:       () => buildShortPrompt(title, channel, transcript, lang),
     detailed:    () => buildDetailedPrompt(title, channel, transcript, lang),
-    report:      () => buildReportPrompt(title, channel, transcript, lang),
     timeBlocked: () => buildTimeBlockedPrompt(title, channel, transcript, lang, blockMin, duration),
   };
-  const LABELS = { short: 'Kısa Özet', detailed: 'Detaylı Özet', report: 'Profesyonel Rapor', timeBlocked: 'Zaman Bloklu Özet' };
+  const LABELS = { short: 'Kısa Özet', detailed: 'Detaylı Özet', timeBlocked: 'Zaman Bloklu Özet' };
 
   // Add loading placeholder
   if (contentEl) {
@@ -1244,7 +1420,7 @@ async function startGenerate() {
         type: 'GROK_SUMMARY',
         apiKey,
         prompt: prompts[type](),
-        maxTokens: type === 'report' ? 6000 : 4096,
+        maxTokens: type === 'timeBlocked' ? 6000 : 4096,
       });
       if (!result || result.error) throw new Error(result?.error || 'Yanıt alınamadı');
       summaryResults[type] = result.text;
@@ -1314,6 +1490,253 @@ async function startGenerate() {
   }
 }
 
+// ── Image processing (content script has full DOM access) ──
+const MAX_VN_PER_VIDEO = 8;
+const FULL_MAX_SIDE    = 2000;       // px — full-quality preview longer side
+const FULL_QUALITY     = 0.90;       // JPEG quality for full preview
+const THUMB_MAX_SIDE   = 320;        // px — thumbnail longer side
+const THUMB_QUALITY    = 0.75;       // JPEG quality for thumbnail
+const KEEP_ORIG_BYTES  = 600 * 1024; // files ≤ this size keep original bytes (no re-encode)
+
+// Returns { full, thumb } — full is high-quality (for lightbox),
+// thumb is small (for grid thumbnails).
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = (ev) => {
+      const origDataUrl = ev.target.result;
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        const w0 = img.naturalWidth;
+        const h0 = img.naturalHeight;
+
+        // ── Full-quality version ──
+        let full;
+        if (file.size <= KEEP_ORIG_BYTES && w0 <= FULL_MAX_SIDE && h0 <= FULL_MAX_SIDE) {
+          // Small enough already — keep original bytes verbatim, zero quality loss
+          full = origDataUrl;
+        } else {
+          let fw = w0, fh = h0;
+          if (fw > FULL_MAX_SIDE || fh > FULL_MAX_SIDE) {
+            if (fw >= fh) { fh = Math.round(fh * FULL_MAX_SIDE / fw); fw = FULL_MAX_SIDE; }
+            else          { fw = Math.round(fw * FULL_MAX_SIDE / fh); fh = FULL_MAX_SIDE; }
+          }
+          const fc = document.createElement('canvas');
+          fc.width = fw; fc.height = fh;
+          const fctx = fc.getContext('2d');
+          fctx.imageSmoothingEnabled = true;
+          fctx.imageSmoothingQuality = 'high';
+          fctx.drawImage(img, 0, 0, fw, fh);
+          full = fc.toDataURL('image/jpeg', FULL_QUALITY);
+        }
+
+        // ── Thumbnail version (always regenerated, small and cheap) ──
+        let tw = w0, th = h0;
+        if (tw > THUMB_MAX_SIDE || th > THUMB_MAX_SIDE) {
+          if (tw >= th) { th = Math.round(th * THUMB_MAX_SIDE / tw); tw = THUMB_MAX_SIDE; }
+          else          { tw = Math.round(tw * THUMB_MAX_SIDE / th); th = THUMB_MAX_SIDE; }
+        }
+        const tc = document.createElement('canvas');
+        tc.width = tw; tc.height = th;
+        const tctx = tc.getContext('2d');
+        tctx.imageSmoothingEnabled = true;
+        tctx.imageSmoothingQuality = 'high';
+        tctx.drawImage(img, 0, 0, tw, th);
+        const thumb = tc.toDataURL('image/jpeg', THUMB_QUALITY);
+
+        resolve({ full, thumb });
+      };
+      img.src = origDataUrl;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ── Visual note lightbox ──
+function openVnLightbox(note) {
+  const lb = document.createElement('div');
+  lb.className = 'vv2-lightbox';
+
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'vv2-lb-close';
+  closeBtn.textContent = '×';
+  closeBtn.addEventListener('click', () => lb.remove());
+
+  const stage = document.createElement('div');
+  stage.className = 'vv2-lb-stage';
+
+  const img = document.createElement('img');
+  img.src = note.imageData;   // full-quality version
+  img.alt = 'Görsel not';
+  img.title = 'Zoom için tıkla';
+  img.addEventListener('click', (e) => {
+    e.stopPropagation();
+    lb.classList.toggle('zoomed');
+  });
+  stage.appendChild(img);
+
+  const meta = document.createElement('div');
+  meta.className = 'vv2-lb-meta';
+
+  if (note.timestamp > 0) {
+    const ts = document.createElement('span');
+    ts.className = 'vv2-lb-ts';
+    ts.textContent = fmtTime(note.timestamp);
+    meta.appendChild(ts);
+  }
+
+  if (note.noteText) {
+    const p = document.createElement('p');
+    p.className = 'vv2-lb-note';
+    p.textContent = note.noteText;
+    meta.appendChild(p);
+  }
+
+  lb.appendChild(closeBtn);
+  lb.appendChild(stage);
+  lb.appendChild(meta);
+  // Close on backdrop / stage background click, but NOT on image click (image toggles zoom)
+  lb.addEventListener('click', (e) => { if (e.target === lb || e.target === stage) lb.remove(); });
+  // ESC closes
+  const onKey = (e) => { if (e.key === 'Escape') { lb.remove(); document.removeEventListener('keydown', onKey); } };
+  document.addEventListener('keydown', onKey);
+  document.body.appendChild(lb);
+}
+
+// ── Visual note thumbnail ──
+function appendVnThumb(container, note, videoId) {
+  const wrap = document.createElement('div');
+  wrap.className = 'vv2-vn-thumb';
+  wrap.dataset.vnId = note.id;
+
+  const img = document.createElement('img');
+  img.src = note.thumbData || note.imageData;   // fallback for legacy entries
+  img.alt = 'Görsel not';
+
+  const del = document.createElement('button');
+  del.className = 'vv2-vn-del';
+  del.textContent = '×';
+  del.title = 'Sil';
+  del.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const allNotes = await getVisualNotes();
+    if (allNotes[videoId]) {
+      allNotes[videoId] = allNotes[videoId].filter(n => n.id !== note.id);
+      if (!allNotes[videoId].length) delete allNotes[videoId];
+      await saveVisualNotes(allNotes);
+    }
+    wrap.remove();
+  });
+
+  wrap.appendChild(img);
+  // Show timestamp badge only when a video position was recorded
+  if (note.timestamp > 0) {
+    const ts = document.createElement('div');
+    ts.className = 'vv2-vn-ts';
+    ts.textContent = fmtTime(note.timestamp);
+    wrap.appendChild(ts);
+  }
+  wrap.appendChild(del);
+  wrap.addEventListener('click', () => openVnLightbox(note));
+  container.appendChild(wrap);
+}
+
+// ── Wire visual notes (paste / drag-drop / file picker) ──
+function wireVisualNotes(videoId) {
+  const dropZone    = document.getElementById('vv2-drop-zone');
+  const fileInput   = document.getElementById('vv2-file-input');
+  const vnContainer = document.getElementById('vv2-visual-notes');
+  const noteSection = dropZone?.closest('.vv2-body-section');
+  if (!dropZone || !fileInput || !vnContainer) return;
+
+  // ── Load existing thumbnails ──
+  getVisualNotes().then(allNotes => {
+    (allNotes[videoId] || []).forEach(n => appendVnThumb(vnContainer, n, videoId));
+  });
+
+  // ── Shared: process one or more File/Blob objects ──
+  async function processFiles(files) {
+    const allNotes = await getVisualNotes();
+    const list     = allNotes[videoId] || [];
+    const remaining = MAX_VN_PER_VIDEO - list.length;
+    if (remaining <= 0) {
+      showVnError(`En fazla ${MAX_VN_PER_VIDEO} görsel eklenebilir.`);
+      return;
+    }
+    const toProcess = Array.from(files).filter(f => f.type.startsWith('image/')).slice(0, remaining);
+    if (!toProcess.length) return;
+
+    const timestamp = Math.round(document.querySelector('video')?.currentTime || 0);
+    const noteText  = (document.getElementById('vv2-note')?.value || '').trim();
+
+    for (const file of toProcess) {
+      try {
+        const { full, thumb } = await compressImage(file);
+        const vnData = {
+          id: 'vn_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+          videoId, timestamp,
+          imageData: full,    // full-quality (shown in lightbox)
+          thumbData: thumb,   // small (shown in grid)
+          noteText,
+          capturedAt: Date.now(),
+        };
+        list.push(vnData);
+        appendVnThumb(vnContainer, vnData, videoId);
+      } catch (_) { /* skip unreadable files */ }
+    }
+
+    allNotes[videoId] = list;
+    await saveVisualNotes(allNotes);
+  }
+
+  function showVnError(msg) {
+    let err = dropZone.querySelector('.vv2-vn-limit');
+    if (!err) { err = document.createElement('div'); err.className = 'vv2-vn-limit'; dropZone.appendChild(err); }
+    err.textContent = msg;
+    setTimeout(() => err.remove(), 3000);
+  }
+
+  // ── File picker ──
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files?.length) processFiles(e.target.files);
+    fileInput.value = '';   // reset so same file can be re-selected
+  });
+
+  // ── Drag & drop ──
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropZone.classList.add('drag-over');
+  });
+  dropZone.addEventListener('dragleave', (e) => {
+    if (!dropZone.contains(e.relatedTarget)) dropZone.classList.remove('drag-over');
+  });
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropZone.classList.remove('drag-over');
+    const files = e.dataTransfer?.files;
+    if (files?.length) processFiles(files);
+  });
+
+  // ── Paste (Ctrl+V) on the entire notes section ──
+  if (noteSection) {
+    noteSection.addEventListener('paste', (e) => {
+      const items = Array.from(e.clipboardData?.items || []);
+      const imageFiles = items
+        .filter(item => item.kind === 'file' && item.type.startsWith('image/'))
+        .map(item => item.getAsFile())
+        .filter(Boolean);
+      if (imageFiles.length) {
+        e.preventDefault();   // don't paste as text
+        processFiles(imageFiles);
+      }
+    });
+  }
+}
+
 // ── Stars ──
 function buildStars(val) {
   const container = document.getElementById('vv2-stars');
@@ -1350,7 +1773,7 @@ function wireSaveButton({ videoId, title, channel, url, thumb, duration }) {
 
       // Collect selected types for metadata
       const selectedTypes = [];
-      ['short','detailed','report','timeBlocked'].forEach(type => {
+      ['short','detailed','timeBlocked'].forEach(type => {
         const cb = document.getElementById('cb-' + (type==='timeBlocked'?'time':type));
         if (cb && cb.checked) selectedTypes.push(type);
       });
@@ -1377,6 +1800,7 @@ function wireSaveButton({ videoId, title, channel, url, thumb, duration }) {
       if (idx >= 0) archive[idx] = entry;
       else archive.unshift(entry);
       await saveArchiveData(archive);
+      await clearNoteDraft(videoId);
 
       // Success UI
       const body   = document.getElementById('vv2-body');
@@ -1417,7 +1841,8 @@ async function openPanel() {
   const thumb    = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
   const url      = window.location.href;
 
-  const [archive, folders, settings] = await Promise.all([getArchive(), getFolders(), getSettings()]);
+  const [archive, folders, settings, noteDrafts] = await Promise.all([getArchive(), getFolders(), getSettings(), getNoteDrafts()]);
+  const noteDraft = noteDrafts[videoId] || '';
   const existing = archive.find(v => v.videoId === videoId);
 
   // Restore from session cache first (survives panel close/reopen without archiving)
@@ -1455,7 +1880,7 @@ async function openPanel() {
   document.body.appendChild(backdrop);
   document.body.appendChild(panel);
 
-  wirePanel(videoId, title, channel, url, thumb, duration, existing);
+  wirePanel(videoId, title, channel, url, thumb, duration, existing, noteDraft);
 }
 
 function closePanel() {

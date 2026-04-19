@@ -1,9 +1,10 @@
 // library.js — youLIB v2
 
 // ── State ──
-let archive   = [];
-let folders   = [];
-let settings  = {};
+let archive      = [];
+let folders      = [];
+let settings     = {};
+let visualNotes  = {};  // { [videoId]: [{id, timestamp, imageData, noteText, capturedAt}] }
 
 let currentSort       = 'newest';
 let currentFilter     = 'all';
@@ -75,6 +76,71 @@ function esc(str) {
 function uid() {
   return 'f_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
 }
+function fmtLibTime(sec) {
+  const s  = Math.round(sec || 0);
+  const h  = Math.floor(s / 3600);
+  const m  = Math.floor((s % 3600) / 60);
+  const ss = s % 60;
+  return h > 0
+    ? `${h}:${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`
+    : `${m}:${String(ss).padStart(2,'0')}`;
+}
+function openLibLightbox(note) {
+  const lb = document.createElement('div');
+  lb.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.96);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:14px;';
+
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '×';
+  closeBtn.style.cssText = 'position:absolute;top:14px;right:18px;background:none;border:none;color:rgba(255,255,255,.5);font-size:30px;cursor:pointer;line-height:1;padding:4px;transition:color .15s;z-index:2;';
+  closeBtn.addEventListener('mouseover',  () => { closeBtn.style.color = '#fff'; });
+  closeBtn.addEventListener('mouseout',   () => { closeBtn.style.color = 'rgba(255,255,255,.5)'; });
+  closeBtn.addEventListener('click', () => lb.remove());
+
+  const stage = document.createElement('div');
+  stage.style.cssText = 'flex:1 1 auto;width:100%;display:flex;align-items:center;justify-content:center;overflow:auto;max-height:calc(100vh - 120px);';
+
+  const img = document.createElement('img');
+  img.src = note.imageData;
+  img.alt = 'Görsel not';
+  img.title = 'Zoom için tıkla';
+  const fitCss  = 'max-width:96vw;max-height:88vh;border-radius:6px;box-shadow:0 8px 48px rgba(0,0,0,.8);object-fit:contain;cursor:zoom-in;';
+  const zoomCss = 'max-width:none;max-height:none;width:auto;height:auto;border-radius:6px;box-shadow:0 8px 48px rgba(0,0,0,.8);cursor:zoom-out;';
+  img.style.cssText = fitCss;
+  let zoomed = false;
+  img.addEventListener('click', (e) => {
+    e.stopPropagation();
+    zoomed = !zoomed;
+    img.style.cssText = zoomed ? zoomCss : fitCss;
+    stage.style.alignItems     = zoomed ? 'flex-start' : 'center';
+    stage.style.justifyContent = zoomed ? 'flex-start' : 'center';
+  });
+  stage.appendChild(img);
+
+  const meta = document.createElement('div');
+  meta.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:8px;max-width:min(92vw,750px);flex-shrink:0;';
+
+  if (note.timestamp > 0) {
+    const ts = document.createElement('span');
+    ts.textContent = fmtLibTime(note.timestamp);
+    ts.style.cssText = 'background:rgba(255,255,255,.14);color:rgba(255,255,255,.9);font-size:12px;padding:3px 12px;border-radius:20px;letter-spacing:.04em;';
+    meta.appendChild(ts);
+  }
+
+  if (note.noteText) {
+    const p = document.createElement('p');
+    p.textContent = note.noteText;
+    p.style.cssText = 'color:rgba(255,255,255,.8);font-size:13px;text-align:center;line-height:1.65;margin:0;';
+    meta.appendChild(p);
+  }
+
+  lb.appendChild(closeBtn);
+  lb.appendChild(stage);
+  lb.appendChild(meta);
+  lb.addEventListener('click', (e) => { if (e.target === lb || e.target === stage) lb.remove(); });
+  const onKey = (e) => { if (e.key === 'Escape') { lb.remove(); document.removeEventListener('keydown', onKey); } };
+  document.addEventListener('keydown', onKey);
+  document.body.appendChild(lb);
+}
 function getFolderName(folderId) {
   if (!folderId) return 'Kategorisiz';
   const f = folders.find(x => x.id === folderId);
@@ -100,6 +166,9 @@ document.querySelectorAll('.theme-btn').forEach(btn => {
 // ── Storage ──
 async function persist() {
   await chrome.storage.local.set({ archive, folders, settings });
+}
+async function persistVisualNotes() {
+  await chrome.storage.local.set({ visualNotes });
 }
 
 // ── Stats ──
@@ -530,6 +599,57 @@ function buildModalContent(v) {
   noteSection.appendChild(noteEdit);
   body.appendChild(noteSection);
 
+  // Visual Notes
+  const vnList = visualNotes[vid] || [];
+  if (vnList.length) {
+    const vnSection = document.createElement('div');
+    const vnLabel   = document.createElement('div');
+    vnLabel.className = 'vv-modal-section-label';
+    vnLabel.textContent = 'Görsel Notlar';
+    vnSection.appendChild(vnLabel);
+
+    const vnGrid = document.createElement('div');
+    vnGrid.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;';
+
+    vnList.forEach(note => {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'position:relative;cursor:pointer;border-radius:6px;overflow:hidden;width:110px;height:70px;border:1px solid var(--border);transition:border-color .15s,transform .1s;flex-shrink:0;';
+
+      const img = document.createElement('img');
+      img.src = note.thumbData || note.imageData;   // fallback for legacy entries
+      img.alt = 'Görsel not';
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+
+      const ts = document.createElement('div');
+      ts.style.cssText = 'position:absolute;bottom:3px;left:3px;background:rgba(0,0,0,0.72);color:#fff;font-size:9px;padding:1px 4px;border-radius:3px;letter-spacing:.02em;pointer-events:none;';
+      ts.textContent = fmtLibTime(note.timestamp);
+
+      const del = document.createElement('button');
+      del.style.cssText = 'position:absolute;top:3px;right:3px;background:rgba(200,40,40,.88);color:#fff;border:none;border-radius:3px;width:16px;height:16px;font-size:14px;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;padding:0;';
+      del.textContent = '×';
+      del.title = 'Sil';
+      del.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        visualNotes[vid] = (visualNotes[vid] || []).filter(n => n.id !== note.id);
+        if (!visualNotes[vid].length) delete visualNotes[vid];
+        await persistVisualNotes();
+        wrap.remove();
+      });
+
+      wrap.addEventListener('mouseenter', () => { del.style.display = 'flex'; wrap.style.borderColor = 'var(--accent)'; wrap.style.transform = 'scale(1.04)'; });
+      wrap.addEventListener('mouseleave', () => { del.style.display = 'none'; wrap.style.borderColor = ''; wrap.style.transform = ''; });
+      wrap.addEventListener('click', () => openLibLightbox(note));
+
+      wrap.appendChild(img);
+      wrap.appendChild(ts);
+      wrap.appendChild(del);
+      vnGrid.appendChild(wrap);
+    });
+
+    vnSection.appendChild(vnGrid);
+    body.appendChild(vnSection);
+  }
+
   // Rating
   const ratingSection = document.createElement('div');
   const ratingLabel   = document.createElement('div');
@@ -743,6 +863,8 @@ modalPanel.addEventListener('click', async (e) => {
   if (action === 'modal-delete') {
     if (!confirm('Bu videoyu arşivden silmek istediğinden emin misin?')) return;
     archive = archive.filter(v => v.videoId !== vid);
+    // Görsel notları da temizle
+    if (visualNotes[vid]) { delete visualNotes[vid]; await persistVisualNotes(); }
     await persist();
     closeModal();
     render(); updateStats(); renderFolderSidebar();
@@ -781,15 +903,16 @@ document.querySelectorAll('.sort-tab').forEach(tab => {
 
 // ── Init ──
 async function init() {
-  const result = await chrome.storage.local.get(['archive', 'folders', 'settings']);
+  const result = await chrome.storage.local.get(['archive', 'folders', 'settings', 'visualNotes']);
 
   // Apply settings
   settings = result.settings || {};
   applyTheme(settings.selectedTheme || 'amber');
 
   // Migrate archive
-  archive = migrateArchive(result.archive);
-  folders = result.folders || [];
+  archive      = migrateArchive(result.archive);
+  folders      = result.folders      || [];
+  visualNotes  = result.visualNotes  || {};
 
   // If migration added new fields, persist
   await chrome.storage.local.set({ archive, folders });
