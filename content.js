@@ -518,7 +518,7 @@ function getArchive()   { return new Promise(r => chrome.storage.local.get('arch
 function getFolders()   { return new Promise(r => chrome.storage.local.get('folders', d => r(d.folders || []))); }
 function getSettings()  { return new Promise(r => chrome.storage.local.get('settings', d => r(d.settings || {}))); }
 function getApiKey()    { return new Promise(r => chrome.storage.local.get('apiKey', d => r((d.apiKey || '').trim()))); }
-function getSupadataKey(){ return new Promise(r => chrome.storage.local.get('supadataKey', d => r((d.supadataKey || '').trim()))); }
+
 
 function saveArchiveData(archive) { return new Promise(r => chrome.storage.local.set({ archive }, r)); }
 
@@ -625,14 +625,7 @@ async function fetchTranscript() {
   const videoId = getVideoId();
   if (!videoId) return null;
 
-  // Supadata first
-  const supadataKey = await getSupadataKey();
-  if (supadataKey) {
-    const result = await chrome.runtime.sendMessage({ type:'SUPADATA_TRANSCRIPT', supadataKey, videoId });
-    if (result&&result.text&&result.text.length>80) return result.text;
-  }
-
-  // YT monitor cache
+  //YT monitor cache
   const monitorTracks = await getCaptionTracksFromMonitor(3000);
   if (monitorTracks&&monitorTracks.length) { const t=await fetchTextFromTracks(monitorTracks); if(t)return t; }
 
@@ -782,40 +775,16 @@ function buildTimeBlockedPrompt(title, channel, transcript, lang, blockMinutes, 
 
   return `${langInstr}
 
-Sen deneyimli bir öğretmensin. "${title}" (Kanal: ${channel}, Süre: ~${totalMin} dk) videosunu ${blockMinutes} dakikalık zaman bloklarına bölerek ÖĞRETİCİ şekilde anlat. Trading, eğitim ve teknik anlatımlarda öğreticiliği artır.
+Aşağıda "${title}" videosunun (Kanal: ${channel}, Süre: ${totalMin} dakika) transkripti var. Bu videoyu ${blockMinutes} dakikalık bölümlere ayırarak özetle.
 
-▶ TEMEL KURALLAR
-1. Her blok için "**Bu bölümde ne anlatılıyor?**" başlığı ZORUNLU ve en az 3-5 cümleli öğretici bir paragraf olmalı. Tek cümle özet yasak.
-2. Aşağıdaki alt başlıklardan İÇERİĞE UYGUN OLANLARI seç. Hepsini kullanmak zorunda değilsin; içerikte yoksa atla. Sırayı koru:
-   • **Bunun sade Türkçesi** — teknik/jargon anlatımı günlük dile çevir
-   • **Konuşmacının ima ettiği ama açık söylemediği şey** — çıkarımsal içgörü varsa
-   • **Adım adım nasıl kullanılır?** — uygulanabilir adımlar varsa madde madde
-   • **Kritik nokta** veya **Dikkat** — önemli uyarı/vurgu
-   • **Sık karıştırılır** — karışma riski varsa ayrımı açıkla
-3. Bloklar birbirini TEKRAR ETMESİN. Her blok kendi içeriğini anlatsın.
-4. Kullanıcı videoyu izlemediyse bile konuyu anlayabilsin — bağlam ver.
-5. Timestamp'leri doğru kullan; transcript'teki [M:SS] marker'larına göre içeriği ilgili bloğa yerleştir.
+Her bölüm için şu formatı kullan:
 
-▶ ÇIKTI FORMATI (tam olarak bu yapıya uy)
-
-## ${ranges[0] || '0:00 – ?'}
-
-**Bu bölümde ne anlatılıyor?**
-[3-5 cümle öğretici paragraf]
-
-**[Uygun alt başlık]**
-[İçerik]
-
-**[Uygun alt başlık]**
-[İçerik]
+## [başlangıç – bitiş]
+O bölümde anlatılanları 3-5 cümleyle açıkla. Önemli bir kavram, adım veya uyarı varsa kalın başlıkla belirt.
 
 ---
 
-## [Sonraki aralık]
-
-… (tüm bloklar için tekrarla)
-
-▶ ÜRETİLECEK BLOKLAR (tam bu sırayla ve aralıklarla):
+Bölümler:
 ${ranges.map((r, i) => `${i+1}. ${r}`).join('\n')}
 
 ${trPart}`;
@@ -1299,6 +1268,16 @@ function showMomentsBlock(moments) {
   body.innerHTML = ''; // Clear placeholder from renderMarkdown('')
 
   if (moments.raw) {
+    try {
+      const s = moments.raw.indexOf('{'), e = moments.raw.lastIndexOf('}');
+      if (s !== -1 && e !== -1) {
+        const parsed = JSON.parse(moments.raw.slice(s, e + 1));
+        if (parsed && (parsed.criticalMoments || parsed.examPoints || parsed.actionItems)) moments = parsed;
+      }
+    } catch (_) {}
+  }
+
+  if (moments.raw) {
     body.appendChild(renderMarkdown(moments.raw));
   } else {
     const sections = [
@@ -1445,10 +1424,13 @@ async function startGenerate() {
       if (!result || result.error) throw new Error(result?.error || 'Yanıt alınamadı');
       // Parse JSON moments
       try {
-        const jsonStr = result.text.replace(/```json\n?/g,'').replace(/```/g,'').trim();
+        const start = result.text.indexOf('{');
+        const end = result.text.lastIndexOf('}');
+        const jsonStr = (start !== -1 && end !== -1)
+          ? result.text.slice(start, end + 1)
+          : result.text.replace(/```json\n?/g,'').replace(/```/g,'').trim();
         importantMoments = JSON.parse(jsonStr);
       } catch (_) {
-        // Fallback: store as raw markdown text
         importantMoments = { raw: result.text };
       }
     } catch (e) {
@@ -1923,6 +1905,12 @@ if (getVideoId()) {
   setTimeout(injectButton, 1500);
 }
 
+// YouTube SPA navigasyonu: yt-navigate-finish en güvenilir sinyal
+document.addEventListener('yt-navigate-finish', () => {
+  setTimeout(onNavigate, 500);
+});
+
+// Yedek: URL değişimini MutationObserver ile yakala
 let lastUrl = location.href;
 new MutationObserver(() => {
   if (location.href !== lastUrl) {

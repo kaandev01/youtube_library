@@ -1,20 +1,19 @@
 {
   "manifest_version": 3,
   "name": "youLIB",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "YouTube videolarını AI özetiyle arşivle — klasörle, puanla, çoklu özet modları ve çoklu dil desteğiyle.",
   "permissions": ["storage", "activeTab", "scripting", "tabs"],
   "host_permissions": [
     "https://www.youtube.com/*",
-    "https://api.groq.com/*",
-    "https://api.supadata.ai/*"
+    "https://openrouter.ai/*"
   ],
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["https://www.youtube.com/watch*"],
+      "matches": ["https://www.youtube.com/*"],
       "js": ["content.js"],
       "run_at": "document_idle"
     }

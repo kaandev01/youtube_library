@@ -36,28 +36,17 @@ document.getElementById('btn-save-key').addEventListener('click', async () => {
   setTimeout(() => msg.textContent = '', 2000);
 });
 
-// ── Supadata API Key ──
-document.getElementById('btn-save-supadata').addEventListener('click', async () => {
-  const key = document.getElementById('supadata-key-input').value.trim();
-  if (!key) return;
-  await chrome.storage.local.set({ supadataKey: key });
-  const msg = document.getElementById('supadata-saved-msg');
-  msg.textContent = '✓ Kaydedildi';
-  setTimeout(() => msg.textContent = '', 2000);
-});
-
 // ── Init ──
 async function init() {
-  const { apiKey, supadataKey, archive, folders, settings } = await chrome.storage.local.get([
-    'apiKey', 'supadataKey', 'archive', 'folders', 'settings'
+  const { apiKey, archive, folders, settings } = await chrome.storage.local.get([
+    'apiKey', 'archive', 'folders', 'settings'
   ]);
 
   // Apply theme
   applyTheme(settings?.selectedTheme || 'amber');
 
-  // Fill in saved API keys (masked)
+  // Fill in saved API key (masked)
   if (apiKey) document.getElementById('api-key-input').value = apiKey;
-  if (supadataKey) document.getElementById('supadata-key-input').value = supadataKey;
 
   // Stats
   const list = archive || [];

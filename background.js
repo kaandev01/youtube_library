@@ -1,4 +1,4 @@
-// background.js — youLIB v2
+// background.js — youLIB v3
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
@@ -8,105 +8,76 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return false;
   }
 
-  // ── Supadata: YouTube Transcript ──
-  if (message.type === 'SUPADATA_TRANSCRIPT') {
-    const { supadataKey, videoId } = message;
-
-    if (!supadataKey || !supadataKey.trim()) {
-      sendResponse({ error: 'Supadata API Key girilmemiş.' });
-      return false;
-    }
-
-    const url = `https://api.supadata.ai/v1/youtube/transcript?url=${encodeURIComponent('https://www.youtube.com/watch?v=' + videoId)}&text=true`;
-
-    fetch(url, {
-      headers: { 'x-api-key': supadataKey.trim() }
-    })
-    .then(async (r) => {
-      let data;
-      try { data = await r.json(); } catch (_) { data = {}; }
-
-      if (!r.ok) {
-        const msg = data && (data.message || data.error) ? (data.message || data.error) : '';
-        if (r.status === 401 || r.status === 403) return sendResponse({ error: 'Supadata API Key geçersiz. supadata.ai/dashboard adresinden kontrol et.' });
-        if (r.status === 404) return sendResponse({ error: 'Bu video için transkript bulunamadı.' });
-        if (r.status === 429) return sendResponse({ error: 'Supadata aylık limit doldu.' });
-        return sendResponse({ error: msg || ('Supadata hatası HTTP ' + r.status) });
-      }
-
-      let text = '';
-      if (typeof data.content === 'string') {
-        text = data.content;
-      } else if (Array.isArray(data.content)) {
-        text = data.content.map(c => c.text || '').join(' ');
-      } else if (data.transcript) {
-        text = typeof data.transcript === 'string' ? data.transcript : '';
-      }
-
-      text = text.replace(/\s+/g, ' ').trim();
-      if (!text || text.length < 80) {
-        return sendResponse({ error: 'Transkript çok kısa veya boş geldi.' });
-      }
-
-      sendResponse({ text });
-    })
-    .catch(e => sendResponse({ error: 'Supadata bağlantı hatası: ' + (e.message || 'bilinmeyen') }));
-
-    return true;
-  }
-
-  // ── Groq: AI Özeti / Analiz ──
+  // ── OpenRouter: AI Özeti / Analiz ──
   if (message.type === 'GROK_SUMMARY') {
     const { apiKey, prompt, maxTokens } = message;
 
     if (!apiKey || !apiKey.trim()) {
-      sendResponse({ error: 'Groq API Key girilmemiş. Extension ikonuna tıkla ve key\'ini kaydet.' });
+      sendResponse({ error: 'OpenRouter API Key girilmemiş. Extension ikonuna tıkla ve key\'ini kaydet.' });
       return false;
     }
 
-    fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey.trim()}`
-      },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: maxTokens || 4096,
-        temperature: 0.7
-      })
-    })
-    .then(async (r) => {
-      let data;
-      try { data = await r.json(); } catch (_) { data = {}; }
+    // Model zinciri: limit/hata durumunda sıradakine geç
+    const MODELS = [
+      'google/gemma-4-31b-it:free',
+      'meta-llama/llama-3.3-70b-instruct:free',
+      'openrouter/free'
+    ];
+
+    async function tryModel(modelIndex, attemptsLeft) {
+      if (modelIndex >= MODELS.length) {
+        return sendResponse({ error: 'Tüm ücretsiz modeller şu an meşgul. Birkaç dakika sonra tekrar dene.' });
+      }
+
+      const model = MODELS[modelIndex];
+      let r, data;
+      try {
+        r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey.trim()}`,
+            'HTTP-Referer': 'https://github.com/youlib',
+            'X-Title': 'youLIB'
+          },
+          body: JSON.stringify({
+            model,
+            messages: [{ role: 'user', content: prompt }],
+            max_tokens: maxTokens || 8192,
+            temperature: 0.7
+          })
+        });
+        try { data = await r.json(); } catch (_) { data = {}; }
+      } catch (e) {
+        return sendResponse({ error: 'Bağlantı hatası: ' + (e.message || 'bilinmeyen') });
+      }
+
+      // 429 (limit) veya 503 (yoğun) → sonraki modele geç
+      if (r.status === 429 || r.status === 503 || r.status === 529) {
+        if (attemptsLeft > 1) {
+          await new Promise(res => setTimeout(res, 2000));
+          return tryModel(modelIndex, attemptsLeft - 1);
+        }
+        return tryModel(modelIndex + 1, 2);
+      }
 
       if (!r.ok) {
         const apiMsg = data && data.error && data.error.message ? data.error.message : '';
-        if (r.status === 400) return sendResponse({ error: 'Geçersiz istek. Groq API Key\'ini kontrol et.' });
-        if (r.status === 401) return sendResponse({ error: 'Groq API Key tanınmadı. console.groq.com adresinden doğru key\'i kopyaladığından emin ol.' });
-        if (r.status === 403) return sendResponse({ error: 'Groq API Key yetkisiz.' });
-        if (r.status === 429) return sendResponse({ error: 'Groq istek limiti doldu. Birkaç saniye bekle.' });
+        if (r.status === 401 || r.status === 403) return sendResponse({ error: 'OpenRouter API Key geçersiz. openrouter.ai/keys adresinden kontrol et.' });
+        if (r.status === 400) return sendResponse({ error: 'Geçersiz istek. API Key\'ini kontrol et.' });
         return sendResponse({ error: apiMsg || ('Sunucu hatası HTTP ' + r.status) });
       }
 
       const choice = data && data.choices && data.choices[0];
-      if (!choice) return sendResponse({ error: 'Groq\'tan yanıt gelmedi. Tekrar dene.' });
-
-      const finishReason = choice.finish_reason;
-      if (finishReason && finishReason !== 'stop' && finishReason !== 'length') {
-        return sendResponse({ error: 'İçerik oluşturulamadı (' + finishReason + '). Farklı bir video dene.' });
-      }
+      if (!choice) return sendResponse({ error: 'Yanıt gelmedi. Tekrar dene.' });
 
       const text = choice.message && choice.message.content;
       if (!text || !text.trim()) return sendResponse({ error: 'Boş yanıt geldi. Tekrar dene.' });
 
       sendResponse({ text: text.trim() });
-    })
-    .catch(function(e) {
-      sendResponse({ error: 'Groq bağlantı hatası: ' + (e.message || 'bilinmeyen') });
-    });
+    }
 
+    tryModel(0, 2);
     return true;
   }
 });

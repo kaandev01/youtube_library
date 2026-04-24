@@ -776,10 +776,22 @@ function renderImportantMoments(moments) {
     return container;
   }
 
-  // Try to render parsed moments
+  // Try to re-parse raw fallback (e.g. Gemini returned JSON in a code block)
   if (moments.raw) {
-    container.appendChild(renderMarkdown(moments.raw));
-    return container;
+    try {
+      const start = moments.raw.indexOf('{');
+      const end = moments.raw.lastIndexOf('}');
+      if (start !== -1 && end !== -1) {
+        const parsed = JSON.parse(moments.raw.slice(start, end + 1));
+        if (parsed && (parsed.criticalMoments || parsed.examPoints || parsed.actionItems)) {
+          moments = parsed;
+        }
+      }
+    } catch (_) {}
+    if (moments.raw) {
+      container.appendChild(renderMarkdown(moments.raw));
+      return container;
+    }
   }
 
   const sections = [
