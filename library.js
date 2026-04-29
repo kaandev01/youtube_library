@@ -555,7 +555,7 @@ function buildModalContent(v) {
     } else {
       allSummaryKeys.forEach((key, idx) => {
         const label2 = SUMMARY_LABELS[key] || key;
-        const sec    = makeSummaryBlock(label2, sr[key], idx === 0);
+        const sec    = makeSummaryBlock(label2, sr[key], idx === 0, key === 'timeBlocked');
         summarySection.appendChild(sec);
       });
     }
@@ -750,7 +750,23 @@ function buildModalContent(v) {
   });
 }
 
-function makeSummaryBlock(label, text, openByDefault) {
+function parseTimeBlockedToCards(text) {
+  const blocks = [];
+  const parts = text.split(/(?=##\s*⏱)/);
+  for (const part of parts) {
+    const trimmed = part.trim();
+    if (!trimmed) continue;
+    const headerMatch = trimmed.match(/^##\s*⏱\s*([\d:]+\s*[–\-]\s*[\d:]+)/);
+    if (headerMatch) {
+      blocks.push({ range: headerMatch[1].trim(), content: trimmed.slice(headerMatch[0].length).trim() });
+    } else if (blocks.length === 0 && trimmed.length > 20) {
+      blocks.push({ range: '', content: trimmed });
+    }
+  }
+  return blocks;
+}
+
+function makeSummaryBlock(label, text, openByDefault, isTimeBlocked) {
   const sec = document.createElement('div');
   sec.className = 'modal-summary-section' + (openByDefault ? ' open' : '');
   const hdr = document.createElement('div');
@@ -759,7 +775,29 @@ function makeSummaryBlock(label, text, openByDefault) {
     <span class="expand-arrow">▾</span>`;
   const bdy = document.createElement('div');
   bdy.className = 'modal-summary-section-body' + (openByDefault ? ' open' : '');
-  bdy.appendChild(renderMarkdown(text));
+
+  if (isTimeBlocked) {
+    const blocks = parseTimeBlockedToCards(text);
+    if (blocks.length > 0) {
+      blocks.forEach(block => {
+        const card = document.createElement('div');
+        card.style.cssText = 'background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;';
+        if (block.range) {
+          const rangeEl = document.createElement('div');
+          rangeEl.style.cssText = 'display:inline-block;font-size:10px;font-weight:700;color:var(--accent);background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:99px;padding:2px 10px;margin-bottom:10px;letter-spacing:0.04em;';
+          rangeEl.textContent = '⏱ ' + block.range;
+          card.appendChild(rangeEl);
+        }
+        card.appendChild(renderMarkdown(block.content));
+        bdy.appendChild(card);
+      });
+    } else {
+      bdy.appendChild(renderMarkdown(text));
+    }
+  } else {
+    bdy.appendChild(renderMarkdown(text));
+  }
+
   hdr.addEventListener('click', () => {
     sec.classList.toggle('open');
     bdy.classList.toggle('open');
@@ -783,7 +821,7 @@ function renderImportantMoments(moments) {
       const end = moments.raw.lastIndexOf('}');
       if (start !== -1 && end !== -1) {
         const parsed = JSON.parse(moments.raw.slice(start, end + 1));
-        if (parsed && (parsed.criticalMoments || parsed.examPoints || parsed.actionItems)) {
+        if (parsed && (parsed.criticalMoments || parsed.keyTakeaways || parsed.examPoints || parsed.actionItems)) {
           moments = parsed;
         }
       }
@@ -794,10 +832,13 @@ function renderImportantMoments(moments) {
     }
   }
 
+  // examPoints → keyTakeaways backward compat
+  if (moments.examPoints && !moments.keyTakeaways) moments.keyTakeaways = moments.examPoints;
+
   const sections = [
-    { key: 'criticalMoments', label: 'Kritik Anlar',      badge: 'vv-badge-crit' },
-    { key: 'examPoints',      label: 'Sınavlık Noktalar', badge: 'vv-badge-info' },
-    { key: 'actionItems',     label: 'Aksiyon Önerileri', badge: 'vv-badge-warn' },
+    { key: 'criticalMoments', label: 'Kritik Anlar',        badge: 'vv-badge-crit' },
+    { key: 'keyTakeaways',    label: 'Öne Çıkan Noktalar',  badge: 'vv-badge-info' },
+    { key: 'actionItems',     label: 'Aksiyon Maddeleri',   badge: 'vv-badge-warn' },
   ];
 
   sections.forEach(({ key, label, badge }) => {

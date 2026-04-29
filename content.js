@@ -310,6 +310,10 @@ function injectStyles() {
     .vv2-expand-arrow { font-size: 10px; color: var(--vv-cream-dim); transition: transform 0.2s; }
     .vv2-summary-block.open .vv2-expand-arrow { transform: rotate(180deg); }
 
+    /* ── Time-blocked cards ── */
+    .vv2-timeblock-card { background: var(--vv-bg2); border: 1px solid var(--vv-border); border-radius: var(--vv-r-md); padding: 12px 14px; margin-bottom: 10px; }
+    .vv2-timeblock-range { display: inline-block; font-size: 10px; font-weight: 700; font-family: var(--vv-font-mono, monospace); color: var(--vv-accent); background: var(--vv-accent-glow); border: 1px solid rgba(245,158,11,0.2); border-radius: 99px; padding: 2px 10px; margin-bottom: 10px; letter-spacing: 0.04em; }
+
     /* ── Important moments ── */
     .vv2-moments-grid { display: flex; flex-direction: column; gap: 7px; }
     .vv2-moment-item { background: var(--vv-bg3); border: 1px solid var(--vv-border); border-radius: var(--vv-r-md); padding: 10px 12px; }
@@ -779,6 +783,55 @@ Bu bölüm tamamen AI'ın eklediği ek bağlamdır. Video bu bilgileri içermiyo
 ${trPart}`;
 }
 
+// ── Zaman Haritası: markdown'ı bloklara parse et ve kart olarak render et ──
+function parseTimeBlockedToCards(text) {
+  const blocks = [];
+  const parts = text.split(/(?=##\s*⏱)/);
+  for (const part of parts) {
+    const trimmed = part.trim();
+    if (!trimmed) continue;
+    const headerMatch = trimmed.match(/^##\s*⏱\s*([\d:]+\s*[–\-]\s*[\d:]+)/);
+    if (headerMatch) {
+      const range   = headerMatch[1].trim();
+      const content = trimmed.slice(headerMatch[0].length).trim();
+      blocks.push({ range, content });
+    } else if (blocks.length === 0 && trimmed.length > 20) {
+      // Başlıksız baş içerik
+      blocks.push({ range: '', content: trimmed });
+    }
+  }
+  return blocks;
+}
+
+function renderTimeBlockedSection(text) {
+  const wrapper = document.createElement('div');
+  if (!text || !text.trim()) return wrapper;
+
+  const blocks = parseTimeBlockedToCards(text);
+
+  if (blocks.length === 0) {
+    // Fallback: düz markdown
+    wrapper.appendChild(renderMarkdown(text));
+    return wrapper;
+  }
+
+  blocks.forEach(block => {
+    const card = document.createElement('div');
+    card.className = 'vv2-timeblock-card';
+    if (block.range) {
+      const rangeEl = document.createElement('div');
+      rangeEl.className = 'vv2-timeblock-range';
+      rangeEl.textContent = '⏱ ' + block.range;
+      card.appendChild(rangeEl);
+    }
+    if (block.content) {
+      card.appendChild(renderMarkdown(block.content));
+    }
+    wrapper.appendChild(card);
+  });
+  return wrapper;
+}
+
 // Transkripti [D:SS] damgalarına göre saniye bazlı segmentlere böl
 function parseTranscriptSegments(transcript) {
   if (!transcript) return [];
@@ -828,40 +881,53 @@ function buildTimeBlockedPrompt(title, channel, transcript, lang, blockMinutes, 
     return `${m}:${String(s).padStart(2,'0')}`;
   };
 
-  // Transkripti bloklara böl
+  const blockCount = Math.ceil(totalMin / blockMinutes);
+
+  // Transkripti her zaman eşit parçalara böl (güvenilir temel)
+  const clean = transcript
+    ? transcript.replace(/\[\d+:\d{2}\]/g, ' ').replace(/\s+/g, ' ').trim()
+    : '';
+  const chunkSize = clean.length > 0 ? Math.ceil(clean.length / blockCount) : 0;
+  const evenChunks = Array.from({ length: blockCount }, (_, i) =>
+    clean.slice(i * chunkSize, (i + 1) * chunkSize).trim()
+  );
+
+  // Timestamp'e göre grupla (varsa öncelikli kullan)
   const segments = transcript ? parseTranscriptSegments(transcript) : [];
   const grouped  = groupSegmentsByBlock(segments, blockMinutes);
 
-  // Her blok için başlık + transkript metni oluştur
-  const blockCount = Math.ceil(totalMin / blockMinutes);
   const blocksText = Array.from({ length: blockCount }, (_, i) => {
     const startSec = i * blockMinutes * 60;
     const endSec   = Math.min((i + 1) * blockMinutes * 60, totalMin * 60);
     const label    = `${fmt(startSec)} – ${fmt(endSec)}`;
-    const raw      = (grouped[i] || []).join(' ').trim();
-    const blockTranscript = raw
+
+    // Timestamp bloğu varsa ve yeterliyse onu kullan, yoksa eşit chunk'ı kullan
+    const tsRaw    = (grouped[i] || []).join(' ').trim();
+    const raw      = tsRaw.length > 50 ? tsRaw : (evenChunks[i] || '');
+
+    const blockTranscript = raw.length > 20
       ? `Transkript:\n"${raw.substring(0, 3000)}"`
-      : `(Bu zaman aralığında transkript bulunamadı — videonun genel akışından tahmin et.)`;
+      : `(Bu aralıkta transkript bulunamadı.)`;
 
     return `## ⏱ ${label}
 
 ${blockTranscript}
 
 **Ne anlatıldı?**
-Yukarıdaki transkript cümlelerini kullanarak bu bölümde gerçekten söylenenleri 4-6 cümleyle açıkla. Konuşmacının verdiği örnekleri ve açıklamaları dahil et.
+Yukarıdaki transkript cümlelerini kullanarak bu bölümde söylenenleri 4-6 cümleyle açıkla. Konuşmacının örneklerini ve açıklamalarını dahil et.
 
 **Öne çıkan fikir**
 Bu bölümün en önemli fikri veya kavramı — 2-3 cümle.
 
 **Pratik çıkarım**
-Bu bölümden uygulanabilir 1-2 somut öneri. Yoksa bu başlığı atla.
+Varsa 1-2 somut öneri. Yoksa bu başlığı atla.
 
 ---`;
   }).join('\n\n');
 
   return `${langInstr}
 
-"${title}" (Kanal: ${channel}, Süre: ${totalMin} dakika) videosunun her zaman bloğu için aşağıdaki transkript cümlelerini kullanarak detaylı analiz yaz. Transkript dışına çıkma.
+"${title}" (Kanal: ${channel}, Süre: ${totalMin} dakika) videosunun her zaman bloğu için verilen transkript cümlelerini kullanarak detaylı analiz yaz.
 
 ${blocksText}`;
 }
@@ -875,38 +941,27 @@ function buildImportantMomentsPrompt(title, channel, transcript, lang, durationS
 
   return `${langInstr}
 
-"${title}" başlıklı YouTube videosunu (Kanal: ${channel}, Süre: ~${totalMin} dakika) analiz et ve şunları üret:
+"${title}" videosunu (Kanal: ${channel}, Süre: ~${totalMin} dakika) analiz et. Yanıtını yalnızca aşağıdaki JSON formatında ver, başka hiçbir metin ekleme.
 
-CEVABINI TAM OLARAK BU JSON FORMATINDA VER (başka metin ekleme):
 {
   "criticalMoments": [
-    { "title": "...", "description": "...", "reason": "...", "timestamp": "MM:SS" },
-    { "title": "...", "description": "...", "reason": "...", "timestamp": "MM:SS" },
-    { "title": "...", "description": "...", "reason": "...", "timestamp": "MM:SS" },
-    { "title": "...", "description": "...", "reason": "...", "timestamp": "MM:SS" },
-    { "title": "...", "description": "...", "reason": "...", "timestamp": "MM:SS" }
+    { "title": "kısa başlık", "description": "ne oldu veya ne söylendi", "timestamp": "D:SS veya null" }
   ],
-  "examPoints": [
-    { "title": "...", "description": "...", "reason": "...", "timestamp": "MM:SS" },
-    { "title": "...", "description": "...", "reason": "...", "timestamp": "MM:SS" },
-    { "title": "...", "description": "...", "reason": "...", "timestamp": "MM:SS" }
+  "keyTakeaways": [
+    { "title": "kısa başlık", "description": "videodan çıkan önemli fikir veya mesaj" }
   ],
   "actionItems": [
-    { "title": "...", "description": "...", "reason": "...", "timestamp": null },
-    { "title": "...", "description": "...", "reason": "...", "timestamp": null },
-    { "title": "...", "description": "...", "reason": "...", "timestamp": null },
-    { "title": "...", "description": "...", "reason": "...", "timestamp": null }
+    { "title": "kısa başlık", "description": "somut ve uygulanabilir adım" }
   ]
 }
 
 Kurallar:
-- criticalMoments: Tam 5 kritik an (vurgu içeren, tekrarlanan önemli fikirler, tanımlar)
-- examPoints: Tam 3 sınavlık nokta (öğrenciye yararlı, sınava gelebilecek bilgiler)
-- actionItems: Tam 4 aksiyon önerisi (uygulanabilir, somut tavsiyeler)
-- timestamp: varsa gerçek süre (transkriptten tahmin et), yoksa null yaz
-- title: kısa ve öz başlık
-- description: kısa açıklama
-- reason: neden önemli olduğu
+- criticalMoments: videodaki gerçek dönüm noktaları veya dikkat çekici anlar (3-5 madde)
+- keyTakeaways: videodan çıkan en değerli fikirler ve ana mesajlar (3-5 madde)
+- actionItems: izleyicinin hemen uygulayabileceği somut adımlar — yoksa boş dizi []
+- Her madde kısa, net ve tamamlanmış Türkçe cümle olsun
+- Sınav, akademik veya eğitim bağlamı yoksa öyleymiş gibi yorum yapma
+- Sadece JSON döndür, açıklama veya markdown ekleme
 
 ${trPart}`;
 }
@@ -1333,14 +1388,25 @@ function wirePanel(videoId, title, channel, url, thumb, duration, existing, note
   wireVisualNotes(videoId);
 }
 
+function renderSummaryEntry(key, text, openByDefault) {
+  const LABELS = { short: 'Hızlı Özet', detailed: 'Derin Analiz', report: 'Profesyonel Rapor', timeBlocked: 'Zaman Haritası' };
+  const label  = LABELS[key] || key;
+  if (key === 'timeBlocked') {
+    const block = createSummaryBlock(label, '', openByDefault);
+    const body  = block.querySelector('.vv2-summary-block-body');
+    if (body) { body.innerHTML = ''; body.appendChild(renderTimeBlockedSection(text)); }
+    return block;
+  }
+  return createSummaryBlock(label, text, openByDefault);
+}
+
 function showExistingResults(sr, moments) {
   const el = document.getElementById('vv2-summary-content');
   if (!el) return;
   el.innerHTML = '';
-  const LABELS = { short: 'Hızlı Özet', detailed: 'Derin Analiz', report: 'Profesyonel Rapor', timeBlocked: 'Zaman Haritası' };
   const keys = Object.keys(sr).filter(k => sr[k]);
   keys.forEach((key, idx) => {
-    el.appendChild(createSummaryBlock(LABELS[key] || key, sr[key], idx === 0));
+    el.appendChild(renderSummaryEntry(key, sr[key], idx === 0));
   });
   if (moments) showMomentsBlock(moments);
   const regenBtn = document.createElement('button');
@@ -1357,12 +1423,15 @@ function showMomentsBlock(moments) {
   const body = block.querySelector('.vv2-summary-block-body');
   body.innerHTML = ''; // Clear placeholder from renderMarkdown('')
 
+  // raw string ise JSON parse dene (eski kayıtlar veya fallback)
   if (moments.raw) {
     try {
       const s = moments.raw.indexOf('{'), e = moments.raw.lastIndexOf('}');
       if (s !== -1 && e !== -1) {
         const parsed = JSON.parse(moments.raw.slice(s, e + 1));
-        if (parsed && (parsed.criticalMoments || parsed.examPoints || parsed.actionItems)) moments = parsed;
+        if (parsed && (parsed.criticalMoments || parsed.keyTakeaways || parsed.examPoints || parsed.actionItems)) {
+          moments = parsed;
+        }
       }
     } catch (_) {}
   }
@@ -1370,10 +1439,13 @@ function showMomentsBlock(moments) {
   if (moments.raw) {
     body.appendChild(renderMarkdown(moments.raw));
   } else {
+    // examPoints → keyTakeaways backward compat
+    if (moments.examPoints && !moments.keyTakeaways) moments.keyTakeaways = moments.examPoints;
+
     const sections = [
       { key: 'criticalMoments', label: 'Kritik Anlar' },
-      { key: 'examPoints',      label: 'Sınavlık Noktalar' },
-      { key: 'actionItems',     label: 'Aksiyon Önerileri' },
+      { key: 'keyTakeaways',    label: 'Öne Çıkan Noktalar' },
+      { key: 'actionItems',     label: 'Aksiyon Maddeleri' },
     ];
     sections.forEach(({ key, label }) => {
       const items = moments[key];
@@ -1388,8 +1460,7 @@ function showMomentsBlock(moments) {
         card.innerHTML = `
           ${item.timestamp ? `<span class="vv2-moment-ts">⏱ ${escHtml(item.timestamp)}</span>` : ''}
           <div class="vv2-moment-title">${escHtml(item.title||'')}</div>
-          <div class="vv2-moment-desc">${escHtml(item.description||'')}</div>
-          ${item.reason ? `<div style="font-size:11px;color:var(--vv-accent);margin-top:3px;font-style:italic;">› ${escHtml(item.reason)}</div>` : ''}`;
+          <div class="vv2-moment-desc">${escHtml(item.description||'')}</div>`;
         body.appendChild(card);
       });
     });
@@ -1541,7 +1612,7 @@ async function startGenerate() {
   if (!contentEl) return;
   const keys = Object.keys(summaryResults).filter(k => summaryResults[k]);
   keys.forEach((key, idx) => {
-    contentEl.appendChild(createSummaryBlock(LABELS[key] || key, summaryResults[key], idx === 0));
+    contentEl.appendChild(renderSummaryEntry(key, summaryResults[key], idx === 0));
   });
   if (importantMoments) showMomentsBlock(importantMoments);
 
