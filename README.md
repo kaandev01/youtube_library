@@ -4,8 +4,10 @@ YouTube videolarını AI özetiyle arşivle, klasörlere ayır, puanla, çoklu d
 
 ## ✨ Özellikler
 
-- **Çoklu Özet Modları** — Kısa / Detaylı / Profesyonel Rapor / Zaman Bloklu
-- **Önemli Anlar** — 5 kritik an, 3 sınavlık nokta, 4 aksiyon önerisi
+- **⚡ Hızlı Özet** — Ana fikir, 3 paragraf
+- **◈ Derin Analiz** — 8 bölümlü kapsamlı analiz: temalar, kavram sözlüğü, kritik içgörüler, uygulanabilir adımlar
+- **⏱ Zaman Haritası** — Transkript cümleleri bloklara bölünerek dakika dakika detaylı özet
+- **✦ Kritik Anlar** — 5 kritik an, 3 sınavlık nokta, 4 aksiyon önerisi
 - **Klasör Sistemi** — Video organizasyonu, özel klasörler
 - **Çoklu Dil** — TR / EN / DE / FR / ES çıktı dili
 - **Tema Sistemi** — Amber (siyah-sarı) ve Mono (açık) tema
@@ -41,3 +43,6 @@ Tek bir key yeterli:
 - **Otomatik fallback** — Model limiti veya hata durumunda sıradaki modele otomatik geçiş
 - **SPA navigasyon düzeltmesi** — Ana sayfadan video açınca buton kaybolmuyordu, düzeltildi
 - **Önemli Anlar düzeltmesi** — JSON parse hatası giderildi, kartlar artık doğru görünüyor
+- **Premium UI** — Özet kartları ikon + başlık + açıklama yapısıyla yenilendi
+- **Derin Analiz güçlendirildi** — 8 bölümlü yapı: tema analizi, kavram sözlüğü, kritik içgörüler, uygulanabilir adımlar, yanlış bilinenler
+- **Zaman Haritası yeniden yazıldı** — Transkript JavaScript'te bloklara bölünüyor, her bloğa sadece o dakikaların metni veriliyor; model artık tahmin yapmıyor

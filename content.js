@@ -180,17 +180,26 @@ function injectStyles() {
     .vv2-radio-card { position: relative; cursor: pointer; }
     .vv2-radio-card input[type="radio"] { position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0; }
     .vv2-radio-card-label {
-      display: flex; align-items: center; justify-content: center; text-align: center;
-      padding: 9px 6px; border: 1px solid var(--vv-border);
+      display: flex; align-items: flex-start; justify-content: flex-start; flex-direction: column; text-align: left;
+      padding: 10px 11px; border: 1px solid var(--vv-border);
       border-radius: var(--vv-r-md); background: var(--vv-bg3);
       font-size: 11px; font-weight: 500; color: var(--vv-cream-dim);
       transition: all 0.15s; cursor: pointer; line-height: 1.3;
     }
-    .vv2-radio-card:hover .vv2-radio-card-label { border-color: var(--vv-border2); color: var(--vv-cream); }
+    .vv2-rc-icon { font-size: 13px; margin-bottom: 5px; display: block; }
+    .vv2-rc-name { font-size: 11px; font-weight: 600; color: var(--vv-cream); display: block; line-height: 1.2; }
+    .vv2-rc-desc { font-size: 9.5px; color: var(--vv-cream-dim); margin-top: 2px; display: block; letter-spacing: 0.01em; }
+    .vv2-radio-card:hover .vv2-radio-card-label { border-color: var(--vv-border2); }
+    .vv2-radio-card:hover .vv2-rc-name { color: var(--vv-accent); }
     .vv2-radio-card input:checked + .vv2-radio-card-label {
       border-color: var(--vv-accent); background: var(--vv-accent-glow);
-      color: var(--vv-accent); font-weight: 600;
     }
+    .vv2-radio-card input:checked + .vv2-radio-card-label .vv2-rc-name { color: var(--vv-accent); font-weight: 700; }
+    .vv2-radio-card input:checked + .vv2-radio-card-label .vv2-rc-icon { filter: brightness(1.3); }
+
+    /* ── Toggle desc ── */
+    .vv2-toggle-info { display: flex; flex-direction: column; gap: 1px; }
+    .vv2-toggle-desc { font-size: 9.5px; color: var(--vv-cream-dim); letter-spacing: 0.01em; }
 
     /* ── Toggle rows ── */
     .vv2-toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 3px 0; }
@@ -694,28 +703,45 @@ ${trPart}`;
 function buildDetailedPrompt(title, channel, transcript, lang) {
   const langInstr = LANG_INSTRUCTIONS[lang] || LANG_INSTRUCTIONS['tr'];
   const trPart = transcript
-    ? `Transkript:\n${transcript.substring(0,18000)}`
+    ? `Transkript:\n${transcript.substring(0, 28000)}`
     : `(Transkript bulunamadı — başlık ve kanala göre tahmin yap.)`;
   return `${langInstr}
 
-Sen bir eğitim uzmanısın. "${title}" başlıklı YouTube videosunu (Kanal: ${channel}) detaylı şekilde özetle.
+"${title}" (Kanal: ${channel}) videosunu aşağıdaki yapıya göre derinlemesine analiz et. Her bölüm uzun ve dolu olsun — bu bir derin analiz, yüzeysel geçme.
 
-Şu yapıyı kullan:
+## 🎯 VİDEONUN ÖZÜ
+Videonun tek cümlelik ana tezi nedir? Ardından bu tezi 4-6 cümleyle genişlet. İzleyici neden bu videoyu izlemiş olabilir ve ne kazandı?
 
-## GENEL ÖZET
-Videonun ana fikrini ve amacını 3-5 cümleyle anlat.
+## 🧠 ANA TEMALAR VE FİKİRLER
+Videodaki 3-6 ana temayı belirle. Her tema için:
+- Temanın başlığı (kalın)
+- Ne anlatıldığı (en az 3-4 cümle)
+- Konuşmacının bu konudaki perspektifi ve vurguladığı şey
+- Bu fikrin neden önemli olduğu
 
-## BÖLÜM BÖLÜM İÇERİK
-Transkripti mantıksal parçalara böl. Her bölüm için başlık yaz ve konuyu öğretici şekilde anlat.
+## 📖 BÖLÜM BÖLÜM İÇERİK
+Transkripti mantıksal bölümlere ayır (minimum 4 bölüm). Her bölüm için:
+**[Bölüm Adı]**
+O bölümde anlatılanları eksiksiz ve ayrıntılı yaz — en az 4-5 cümle. Konuşmacının verdiği örnekleri, anlattığı hikayeleri, kullandığı verileri dahil et.
 
-## KAVRAM AÇIKLAMALARI
-Videoda geçen teknik terimler veya özel kavramlar varsa açıkla.
+## 🔑 KAVRAM VE TERİM SÖZLÜĞÜ
+Videoda geçen teknik terimler, jargon veya özel kavramları listele. Her biri için:
+- **Terim**: Günlük dilde ne anlama gelir, neden önemli, nasıl kullanılır
 
-## KRİTİK NOKTALAR
-En önemli, dikkat çekici bilgileri listele.
+## ⚡ KRİTİK İÇGÖRÜLER
+Konuşmacının söylediği ama çoğu izleyicinin gözden kaçırabileceği derin çıkarımları yaz. Bunlar "satır arası" mesajlar, ima edilen ama açık söylenmeyen şeyler veya vurgulanmadan geçilen kritik noktalar olabilir. En az 5 madde.
 
-## EN ÖNEMLİ ÇIKARIMLAR
-Bu videodan öğrenilecek 3-5 anahtar mesaj.
+## ✅ UYGULANABİLİR ADIMLAR
+Bu videodan çıkan somut, hemen uygulanabilir 5-8 adımı listele. Her adım için "ne yapmalı" ve "neden" kısmını açıkla.
+
+## ⚠️ YANLIŞ BİLİNENLER VE UYARILAR
+Videoda düzeltilen yaygın yanlış anlamalar, dikkat edilmesi gereken tuzaklar veya "bunu yapma" uyarıları varsa yaz.
+
+## 💡 BAĞLAM VE DERİNLEŞTİRME
+Bu konuyu daha iyi anlamak için bilinmesi gereken arka plan bilgisi, ilgili kavramlar veya bu videoyu tamamlayan düşünceler.
+
+## 🏆 EN DEĞERLI 3 ÇIKARI
+Tüm video içinden en kalıcı, en değerli 3 fikri seç ve her birini 2-3 cümleyle derinleştir.
 
 ${trPart}`;
 }
@@ -753,41 +779,91 @@ Bu bölüm tamamen AI'ın eklediği ek bağlamdır. Video bu bilgileri içermiyo
 ${trPart}`;
 }
 
+// Transkripti [D:SS] damgalarına göre saniye bazlı segmentlere böl
+function parseTranscriptSegments(transcript) {
+  if (!transcript) return [];
+  const regex = /\[(\d+):(\d{2})\]/g;
+  const segments = [];
+  let lastMatch = null, lastIndex = 0;
+
+  let match;
+  while ((match = regex.exec(transcript)) !== null) {
+    if (lastMatch !== null) {
+      segments.push({
+        startSec: lastMatch.sec,
+        text: transcript.slice(lastIndex, match.index).replace(/\[\d+:\d{2}\]/g, '').trim()
+      });
+    }
+    lastMatch = { sec: parseInt(match[1]) * 60 + parseInt(match[2]) };
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastMatch !== null) {
+    segments.push({
+      startSec: lastMatch.sec,
+      text: transcript.slice(lastIndex).replace(/\[\d+:\d{2}\]/g, '').trim()
+    });
+  }
+  return segments;
+}
+
+// Segmentleri blockMinutes'e göre grupla
+function groupSegmentsByBlock(segments, blockMinutes) {
+  const blockSec = blockMinutes * 60;
+  const blocks = {};
+  segments.forEach(seg => {
+    const blockIdx = Math.floor(seg.startSec / blockSec);
+    if (!blocks[blockIdx]) blocks[blockIdx] = [];
+    blocks[blockIdx].push(seg.text);
+  });
+  return blocks;
+}
+
 function buildTimeBlockedPrompt(title, channel, transcript, lang, blockMinutes, durationSec) {
   const langInstr = LANG_INSTRUCTIONS[lang] || LANG_INSTRUCTIONS['tr'];
   const totalMin  = Math.max(1, Math.ceil((durationSec || 0) / 60));
 
-  // Compute time ranges as "M:SS – M:SS"
   const fmt = (totalSec) => {
     const m = Math.floor(totalSec / 60);
     const s = totalSec % 60;
     return `${m}:${String(s).padStart(2,'0')}`;
   };
-  const ranges = [];
-  for (let s = 0; s < totalMin * 60; s += blockMinutes * 60) {
-    const e = Math.min(s + blockMinutes * 60, totalMin * 60);
-    ranges.push(`${fmt(s)} – ${fmt(e)}`);
-  }
 
-  const trPart = transcript
-    ? `Transkript (köşeli parantezli timestamp'ler her segmentin başlangıç zamanını verir — blokları bunlara göre ayır):\n${transcript.substring(0, 24000)}`
-    : `(Transkript bulunamadı — başlık ve kanaldan yola çıkarak mantıklı bir akış kurgula. Blokları tahmini olarak üret.)`;
+  // Transkripti bloklara böl
+  const segments = transcript ? parseTranscriptSegments(transcript) : [];
+  const grouped  = groupSegmentsByBlock(segments, blockMinutes);
+
+  // Her blok için başlık + transkript metni oluştur
+  const blockCount = Math.ceil(totalMin / blockMinutes);
+  const blocksText = Array.from({ length: blockCount }, (_, i) => {
+    const startSec = i * blockMinutes * 60;
+    const endSec   = Math.min((i + 1) * blockMinutes * 60, totalMin * 60);
+    const label    = `${fmt(startSec)} – ${fmt(endSec)}`;
+    const raw      = (grouped[i] || []).join(' ').trim();
+    const blockTranscript = raw
+      ? `Transkript:\n"${raw.substring(0, 3000)}"`
+      : `(Bu zaman aralığında transkript bulunamadı — videonun genel akışından tahmin et.)`;
+
+    return `## ⏱ ${label}
+
+${blockTranscript}
+
+**Ne anlatıldı?**
+Yukarıdaki transkript cümlelerini kullanarak bu bölümde gerçekten söylenenleri 4-6 cümleyle açıkla. Konuşmacının verdiği örnekleri ve açıklamaları dahil et.
+
+**Öne çıkan fikir**
+Bu bölümün en önemli fikri veya kavramı — 2-3 cümle.
+
+**Pratik çıkarım**
+Bu bölümden uygulanabilir 1-2 somut öneri. Yoksa bu başlığı atla.
+
+---`;
+  }).join('\n\n');
 
   return `${langInstr}
 
-Aşağıda "${title}" videosunun (Kanal: ${channel}, Süre: ${totalMin} dakika) transkripti var. Bu videoyu ${blockMinutes} dakikalık bölümlere ayırarak özetle.
+"${title}" (Kanal: ${channel}, Süre: ${totalMin} dakika) videosunun her zaman bloğu için aşağıdaki transkript cümlelerini kullanarak detaylı analiz yaz. Transkript dışına çıkma.
 
-Her bölüm için şu formatı kullan:
-
-## [başlangıç – bitiş]
-O bölümde anlatılanları 3-5 cümleyle açıkla. Önemli bir kavram, adım veya uyarı varsa kalın başlıkla belirt.
-
----
-
-Bölümler:
-${ranges.map((r, i) => `${i+1}. ${r}`).join('\n')}
-
-${trPart}`;
+${blocksText}`;
 }
 
 function buildImportantMomentsPrompt(title, channel, transcript, lang, durationSec) {
@@ -907,11 +983,19 @@ function buildPanelHTML({ title, channel, duration, thumb, existing, settings, f
           <div class="vv2-radio-cards">
             <label class="vv2-radio-card" for="cb-short">
               <input type="radio" id="cb-short" name="summary-mode" value="short" ${radioChk('short')} />
-              <span class="vv2-radio-card-label">Kısa</span>
+              <span class="vv2-radio-card-label">
+                <span class="vv2-rc-icon">⚡</span>
+                <span class="vv2-rc-name">Hızlı Özet</span>
+                <span class="vv2-rc-desc">Ana fikir, 3 paragraf</span>
+              </span>
             </label>
             <label class="vv2-radio-card" for="cb-detailed">
               <input type="radio" id="cb-detailed" name="summary-mode" value="detailed" ${radioChk('detailed')} />
-              <span class="vv2-radio-card-label">Detaylı</span>
+              <span class="vv2-radio-card-label">
+                <span class="vv2-rc-icon">◈</span>
+                <span class="vv2-rc-name">Derin Analiz</span>
+                <span class="vv2-rc-desc">Tam içerik, kapsamlı</span>
+              </span>
             </label>
           </div>
         </div>
@@ -922,7 +1006,10 @@ function buildPanelHTML({ title, channel, duration, thumb, existing, settings, f
           <div class="vv2-field-label">Ek Özellikler</div>
 
           <div class="vv2-toggle-row">
-            <span class="vv2-toggle-name">Zaman Bloklu Özet</span>
+            <div class="vv2-toggle-info">
+              <span class="vv2-toggle-name">⏱ Zaman Haritası</span>
+              <span class="vv2-toggle-desc">Dakika dakika içerik akışı</span>
+            </div>
             <label class="vv2-switch">
               <input type="checkbox" id="cb-time" ${timeChecked} />
               <span class="vv2-switch-thumb"></span>
@@ -939,7 +1026,10 @@ function buildPanelHTML({ title, channel, duration, thumb, existing, settings, f
           </div>
 
           <div class="vv2-toggle-row" style="margin-top:10px;">
-            <span class="vv2-toggle-name">Önemli Anlar</span>
+            <div class="vv2-toggle-info">
+              <span class="vv2-toggle-name">✦ Kritik Anlar</span>
+              <span class="vv2-toggle-desc">5 an · 3 nokta · 4 öneri</span>
+            </div>
             <label class="vv2-switch">
               <input type="checkbox" id="cb-moments" />
               <span class="vv2-switch-thumb"></span>
@@ -1247,7 +1337,7 @@ function showExistingResults(sr, moments) {
   const el = document.getElementById('vv2-summary-content');
   if (!el) return;
   el.innerHTML = '';
-  const LABELS = { short: 'Kısa Özet', detailed: 'Detaylı Özet', report: 'Profesyonel Rapor', timeBlocked: 'Zaman Bloklu Özet' };
+  const LABELS = { short: 'Hızlı Özet', detailed: 'Derin Analiz', report: 'Profesyonel Rapor', timeBlocked: 'Zaman Haritası' };
   const keys = Object.keys(sr).filter(k => sr[k]);
   keys.forEach((key, idx) => {
     el.appendChild(createSummaryBlock(LABELS[key] || key, sr[key], idx === 0));
@@ -1263,7 +1353,7 @@ function showExistingResults(sr, moments) {
 function showMomentsBlock(moments) {
   const el = document.getElementById('vv2-summary-content');
   if (!el) return;
-  const block = createSummaryBlock('Önemli Anlar', '', false);
+  const block = createSummaryBlock('✦ Kritik Anlar', '', false);
   const body = block.querySelector('.vv2-summary-block-body');
   body.innerHTML = ''; // Clear placeholder from renderMarkdown('')
 
@@ -1399,7 +1489,7 @@ async function startGenerate() {
         type: 'GROK_SUMMARY',
         apiKey,
         prompt: prompts[type](),
-        maxTokens: type === 'timeBlocked' ? 6000 : 4096,
+        maxTokens: type === 'timeBlocked' ? 10000 : type === 'detailed' ? 8000 : 4096,
       });
       if (!result || result.error) throw new Error(result?.error || 'Yanıt alınamadı');
       summaryResults[type] = result.text;
